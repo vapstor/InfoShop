@@ -13,7 +13,7 @@
 
 ## 📋 Briefing
 
-  Aplicativo para listar projetos de diferentes profissionais (Elétrica, Mecânica, Civil, Arquitetura, etc...). 
+  Aplicativo (MVP) para listar projetos de diferentes profissionais (Elétrica, Mecânica, Civil, Arquitetura, etc...). 
   Desenvolvido em java utilizando a arquitetura MVVM e firebase como back-end e armazenamento de dados.
 
 ## 📖 Requirements
