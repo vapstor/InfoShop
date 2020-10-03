@@ -64,6 +64,10 @@
   - [x] Implementar TextInputsLayouts e TextViews
   - [x] Implementar autenticação no firebase
   
+* Desenvolver CadastroPage ["Cadastro"]
+  - [ ] Implementar Inputs (nome, usuário, email, senha, telefone (Máscara), Endereço
+  - [ ] Implementar Button "cadastrar"
+  
 * Desenvolver HomePage ["HOME"]
   -  [x] Implementar views de boas-vindas dinâmica
   -  [x] Implementar Bottom Navigation
