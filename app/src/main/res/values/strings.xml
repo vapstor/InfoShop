@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">InfoShop</string>
+    <string name="title_profile">Perfil</string>
+    <string name="title_home">Home</string>
+    <string name="title_projects">Projetos</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="bom_dia_">"Bom dia, "</string>
+    <string name="boa_tarde_">"Boa tarde, "</string>
+    <string name="boa_noite_">"Boa noite, "</string>
+    <string name="adicionar">adicionar</string>
+    <string name="lorem_ipsum_1p">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse libero massa, fermentum a erat dapibus, sagittis bibendum dolor. Vivamus scelerisque, est id blandit sodales, augue lectus elementum ex, eu laoreet mi arcu sit amet nisi. Morbi hendrerit enim sit amet eros aliquam blandit. Aenean iaculis, sem id feugiat dapibus, sapien ligula faucibus metus, sed porttitor libero purus sed felis. Vivamus libero turpis, elementum vel varius vel, eleifend at est. Maecenas in congue libero, ac pellentesque tellus. Proin convallis nibh odio, et placerat purus congue at. Nullam tempus metus mauris, eu convallis orci cursus nec. Aenean turpis nisi, sollicitudin lobortis erat eu, ornare bibendum ante. Pellentesque ut orci lobortis, varius dui et, hendrerit lacus. Ut vel venenatis ex. Sed egestas, dui ut imperdiet tempus, libero urna ultricies purus, nec iaculis est enim in metus. Aliquam erat volutpat.</string>
+    <string name="nao_e_util">Não é Útil</string>
+    <string name="mensagem">Mensagem</string>
+    <string name="falhou_ao_buscar_projetos_tente_novamente">Falhou ao buscar projetos\ntente novamente!</string>
+    <string name="tentar_novamente">Tentar Novamente</string>
+    <string name="refresh_projects">Refresh Projects</string>
+    <string name="_usuario">\@Usuário</string>
+    <string name="excluir">Excluir</string>
+    <string name="voce_tem_certeza_que_nao_deseja_mais_ver_este_projeto">Você tem certeza que não deseja mais ver este projeto?</string>
+    <string name="cancelar">Cancelar</string>
+</resources>
