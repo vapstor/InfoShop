@@ -1,19 +1,41 @@
 package br.com.infoshop.ui.projects;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+
+import br.com.infoshop.model.Categorie;
+
 public class ProjectsViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    private MutableLiveData<ArrayList<Categorie>> mCategories;
+    private MutableLiveData<ArrayList<Integer>> mFavorites;
 
     public ProjectsViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mCategories = new MutableLiveData<>();
+        mFavorites = new MutableLiveData<>();
+        setCategories(new ArrayList<>());
+        setFavorites(new ArrayList<>());
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public MutableLiveData<ArrayList<Categorie>> getCategoriesLiveData() {
+        return mCategories;
+    }
+
+    public void setCategories(ArrayList<Categorie> categories) {
+        getCategoriesLiveData().setValue(categories);
+    }
+
+    public MutableLiveData<ArrayList<Integer>> getFavoritesLiveData() {
+        return mFavorites;
+    }
+    public void setFavorites(ArrayList<Integer> favorites) {
+        getFavoritesLiveData().setValue(favorites);
+    }
+    public void addFavorite(int index) {
+        ArrayList<Integer> a = getFavoritesLiveData().getValue();
+        a.add(index);
+        getFavoritesLiveData().setValue(a);
     }
 }

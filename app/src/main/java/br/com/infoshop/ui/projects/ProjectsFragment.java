@@ -1,35 +1,46 @@
 package br.com.infoshop.ui.projects;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import br.com.infoshop.R;
+
+import static br.com.infoshop.utils.Util.MY_LOG_TAG;
 
 public class ProjectsFragment extends Fragment {
 
     private ProjectsViewModel projectsViewModel;
+    private NavController navController;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        projectsViewModel =
-                ViewModelProviders.of(this).get(ProjectsViewModel.class);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        navController.navigateUp();
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        navController = NavHostFragment.findNavController(this);
+    }
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        projectsViewModel = new ViewModelProvider(requireParentFragment()).get(ProjectsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_projects, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        projectsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
         return root;
     }
 }

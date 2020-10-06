@@ -4,6 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="br.com.infoshop.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
 
     <fragment
         android:id="@+id/navigation_profile"
@@ -12,14 +18,20 @@
         tools:layout="@layout/fragment_profile" />
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="br.com.infoshop.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
-
-    <fragment
         android:id="@+id/navigation_projects"
         android:name="br.com.infoshop.ui.projects.ProjectsFragment"
         android:label="@string/title_projects"
         tools:layout="@layout/fragment_projects" />
+    <fragment
+        android:id="@+id/navigation_projects_categories"
+        android:name="br.com.infoshop.ui.projects.ProjectsCategoriesFragment"
+        android:label="@string/projects_categories"
+        android:theme="@style/AppTheme.NoActionBar"
+        tools:layout="@layout/fragment_projects_categories">
+
+        <action
+            android:id="@+id/action_navigation_projects_categories_to_navigation_projects"
+            app:destination="@id/navigation_projects" />
+    </fragment>
+
 </navigation>

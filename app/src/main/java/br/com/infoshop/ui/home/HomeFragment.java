@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -38,6 +40,7 @@ import br.com.infoshop.R;
 import br.com.infoshop.adapter.HomeProjectsAdapter;
 import br.com.infoshop.interfaces.IFetchProjects;
 import br.com.infoshop.model.Project;
+import br.com.infoshop.ui.projects.ProjectsViewModel;
 import br.com.infoshop.utils.ItemClickSupport;
 import br.com.infoshop.utils.RecyclerItemTouchHelper;
 
@@ -56,6 +59,10 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     private RecyclerView recyclerProjects;
     private SwipeRefreshLayout swipeContainer;
     private BottomNavigationView navView;
+    private Bundle mBundleRecyclerViewState;
+    private Parcelable mListState;
+    private String KEY_RECYCLER_STATE = "1";
+    private ProjectsViewModel projectsViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,7 +75,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                 updateUI(msg);
             }
         };
-
         //Countdown timeout ao buscar projetos
         countdown = new CountDownTimer(5000, 500) {
             @Override
@@ -84,6 +90,12 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                 }
             }
         };
+
+        navController = NavHostFragment.findNavController(this);
+
+        projectsViewModel = new ViewModelProvider(requireParentFragment()).get(ProjectsViewModel.class);
+
+        Log.d(MY_LOG_TAG, "Ocorreu a criação HOMEFRAGMENT");
     }
 
     private void updateUI(Message msg) {
@@ -191,6 +203,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                 linearLayoutManager = new LinearLayoutManager(getContext());
                 linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                 recyclerProjects.setLayoutManager(linearLayoutManager);
+//                    recyclerProjects.setHasFixedSize(true);
                 recyclerProjects.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
                 recyclerProjects.setItemAnimator(new DefaultItemAnimator());
                 recyclerProjects.setAdapter(adapterProjects);
@@ -220,9 +233,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
 
     private void fetchProjects() {
         //resgata produtos assíncronamente
-        //DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, "15", this);
         swipeContainer.setRefreshing(true);
-//        toggleFrameLoadingVisibility(true);
         instanceFakeProjects();
         //Inicia counter para timeout
         countdown.start();

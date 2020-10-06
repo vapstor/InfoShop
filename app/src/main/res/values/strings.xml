@@ -26,4 +26,7 @@
     <string name="excluir">Excluir</string>
     <string name="voce_tem_certeza_que_nao_deseja_mais_ver_este_projeto">Você tem certeza que não deseja mais ver este projeto?</string>
     <string name="cancelar">Cancelar</string>
+    <string name="categoria">Categoria</string>
+    <string name="projects_categories">Categorias</string>
+    <string name="selecione_uma_categoria">Selecione uma categoria: </string>
 </resources>

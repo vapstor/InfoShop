@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import br.com.infoshop.ui.login.LoginActivity;
+
 import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
 import static java.lang.Thread.sleep;
 

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "672279278249",
+    "firebase_url": "https://infoshop-c1136.firebaseio.com",
+    "project_id": "infoshop-c1136",
+    "storage_bucket": "infoshop-c1136.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672279278249:android:678ea6293fd421b38b6fb8",
+        "android_client_info": {
+          "package_name": "br.com.infoshop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672279278249-1ulb8thmo9aignbdjlopa5l2d4ujbhvd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKXKla1xQwjEjGdgd9jfCgsxwKRNPJNPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "672279278249-1ulb8thmo9aignbdjlopa5l2d4ujbhvd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
