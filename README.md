@@ -114,3 +114,4 @@ Versionamento será dividido entre
 - [ ] Implementar ScreensShots no README.MD
 - [x] Adicionar Dependências
 - [x] Incrementar Todo(Dev)
+
