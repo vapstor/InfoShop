@@ -50,8 +50,8 @@
 - [X] Utilizar MVVM Architeture
 - [x] Utilizar Fundamentos do Material Design
 - [x] Criar SplashScreen
-- [ ] Criar LoginPage
-- [ ] Conexão com o Firebase
+- [x] Criar LoginPage
+- [x] Conexão com o Firebase
 - [x] Configurar botões de BottomNavigation:
   - [x] Perfil
   - [x] Home
@@ -65,8 +65,9 @@
   - [x] Implementar autenticação no firebase
   
 * Desenvolver CadastroPage ["Cadastro"]
-  - [ ] Implementar Inputs (nome, usuário, email, senha, telefone (Máscara), Endereço
-  - [ ] Implementar Button "cadastrar"
+  - [x] Implementar Inputs (nome, usuário, email, senha, telefone (Máscara), Endereço
+  - [x] Implementar Button "cadastrar"
+  - [x] Implementar cadastro no firebase
   
 * Desenvolver HomePage ["HOME"]
   -  [x] Implementar views de boas-vindas dinâmica
