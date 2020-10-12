@@ -44,10 +44,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/home_usuario_text_view"
+        android:id="@+id/home_usuario_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/_usuario"
+        android:text="\@usuario"
         android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/boas_vindas_text_view"

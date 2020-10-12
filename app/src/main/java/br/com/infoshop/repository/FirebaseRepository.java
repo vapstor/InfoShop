@@ -96,20 +96,21 @@ public class FirebaseRepository {
 
     public MutableLiveData<FirebaseUser> firebaseLogin(String username, String password) {
         MutableLiveData<FirebaseUser> userMutableLiveData = new MutableLiveData<>();
-        if (auth.getCurrentUser() != null) {
+        FirebaseUser firebaseUser = auth.getCurrentUser();
+        if (firebaseUser == null) {
             auth.signInWithEmailAndPassword(username, password).
                     addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser firebaseUser = auth.getCurrentUser();
-                            userMutableLiveData.setValue(firebaseUser);
+                            userMutableLiveData.setValue(auth.getCurrentUser());
                         } else {
                             // If sign in fails, display a message to the user.
                             userMutableLiveData.setValue(null);
                         }
                     });
+        } else {
+            userMutableLiveData.setValue(firebaseUser);
         }
-        ;
         return userMutableLiveData;
     }
 }

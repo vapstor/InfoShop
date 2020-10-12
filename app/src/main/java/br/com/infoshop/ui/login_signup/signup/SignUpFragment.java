@@ -34,7 +34,6 @@ import br.com.infoshop.repository.FirebaseRepository;
 public class SignUpFragment extends Fragment {
     private AuthViewModel authViewModel;
     private SignUpViewModel signupViewModel;
-    FirebaseRepository firebaseAuthSource;
     private NavController navController;
     private ProgressBar signupProgressBar;
     private Button signupButton;

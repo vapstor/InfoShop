@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -33,6 +32,7 @@ import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -63,6 +63,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     private Parcelable mListState;
     private String KEY_RECYCLER_STATE = "1";
     private ProjectsViewModel projectsViewModel;
+    private TextView usernameView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -187,6 +188,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
 
         homeViewModel = new ViewModelProvider(requireParentFragment()).get(HomeViewModel.class);
         final TextView boasVindasTextView = root.findViewById(R.id.boas_vindas_text_view);
+        usernameView = root.findViewById(R.id.home_usuario_name_text_view);
 
         homeViewModel.getBoasVindasMessageLiveData().observe(getViewLifecycleOwner(), boasVindasTextView::setText);
         homeViewModel.getProjectsLiveData().observe(getViewLifecycleOwner(), projectsList -> {
@@ -219,6 +221,8 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         super.onViewCreated(view, savedInstanceState);
         Context context = getContext();
         if (context != null) {
+            usernameView.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+
             recyclerProjects = view.findViewById(R.id.recycler_projects_home);
 
             recyclerProjects.setLayoutManager(linearLayoutManager);
@@ -227,6 +231,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             recyclerProjects.setAdapter(adapterProjects);
 
             swipeContainer = view.findViewById(R.id.layout_swipe_refresh);
+
             swipeContainer.setOnRefreshListener(this);
             swipeContainer.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
             /**
