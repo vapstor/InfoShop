@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import br.com.infoshop.R;
 import br.com.infoshop.model.Categorie;
 
-import static br.com.infoshop.utils.Util.MY_LOG_TAG;
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 
 public class ProjectsCategoriesAdapter extends BaseAdapter {
     private final Context context;

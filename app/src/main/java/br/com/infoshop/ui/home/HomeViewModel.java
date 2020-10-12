@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 import br.com.infoshop.model.Project;
 
-import static br.com.infoshop.utils.Util.MY_LOG_TAG;
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 
 public class HomeViewModel extends ViewModel {
 

@@ -7,13 +7,9 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public abstract class Util {
-    public final static String CONNECTION = "CONNECTION";
-    public final static String CONFIG_FILE = "CONFIG_FILE";
-    public final static String MY_LOG_TAG = "VAPSTOR";
-    public final static String DB_PDT = "ws_products";
+import static br.com.infoshop.utils.Constants.elapsedTime;
 
-    public static long elapsedTime = 0;
+public abstract class Util {
 
     public static String RSmask(double valor) {
         BigDecimal bigDecimal = new BigDecimal(valor).setScale(2, BigDecimal.ROUND_HALF_DOWN);

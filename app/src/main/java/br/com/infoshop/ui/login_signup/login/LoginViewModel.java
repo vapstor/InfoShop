@@ -1,45 +1,50 @@
-package br.com.infoshop.ui.login;
-
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+package br.com.infoshop.ui.login_signup.login;
 
 import android.util.Patterns;
 
-import br.com.infoshop.data.LoginRepository;
-import br.com.infoshop.data.Result;
-import br.com.infoshop.data.model.LoggedInUser;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.SavedStateHandle;
+import androidx.lifecycle.ViewModel;
+
+import com.google.firebase.auth.FirebaseUser;
+
 import br.com.infoshop.R;
 
 public class LoginViewModel extends ViewModel {
-
+    private final SavedStateHandle mState;
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository;
+    private MutableLiveData<FirebaseUser> loggedUserLiveData;
 
-    LoginViewModel(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
+    public LoginViewModel(SavedStateHandle savedStateHandle) {
+        mState = savedStateHandle;
+        loggedUserLiveData = new MutableLiveData<>();
     }
 
     LiveData<LoginFormState> getLoginFormState() {
         return loginFormState;
     }
 
-    LiveData<LoginResult> getLoginResult() {
-        return loginResult;
-    }
 
     public void login(String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
 
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
     }
+
+    public MutableLiveData<FirebaseUser> getLoggedUserLiveData() {
+        return loggedUserLiveData;
+    }
+
+//    public void login(String username, String password) {
+//        // can be launched in a separate asynchronous job
+//        Result<LoggedInUser> result = loginRepository.login(username, password);
+//
+//        if (result instanceof Result.Success) {
+//            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+//            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+//        } else {
+//            loginResult.setValue(new LoginResult(R.string.login_failed));
+//        }
+//    }
 
     public void loginDataChanged(String username, String password) {
         if (!isUserNameValid(username)) {

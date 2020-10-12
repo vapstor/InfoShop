@@ -1,4 +1,4 @@
-package br.com.infoshop.ui.login;
+package br.com.infoshop.ui.login_signup.login;
 
 import androidx.annotation.Nullable;
 

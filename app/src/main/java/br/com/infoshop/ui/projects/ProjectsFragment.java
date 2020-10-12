@@ -18,7 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import br.com.infoshop.R;
 
-import static br.com.infoshop.utils.Util.MY_LOG_TAG;
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 
 public class ProjectsFragment extends Fragment {
 

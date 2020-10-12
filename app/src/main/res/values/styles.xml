@@ -27,7 +27,8 @@
         <item name="shapeAppearanceOverlay">
             @style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded
         </item>
-        <item name="buttonStyle">@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored</item>
+        <item name="buttonStyle">@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored
+        </item>
     </style>
 
     <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="">
@@ -38,5 +39,14 @@
         <item name="android:windowContentTransitions">true</item>
     </style>
 
+    <style name="ButtonPrimary">
+        <item name="backgroundTint">@color/colorAccent</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="height">50dp</item>
+    </style>
 
+    <style name="TextLinkDark">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="fontFamily">@font/roboto_light</item>
+    </style>
 </resources>

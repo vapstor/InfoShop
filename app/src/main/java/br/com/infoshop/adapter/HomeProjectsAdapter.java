@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Callback;
@@ -21,10 +20,9 @@ import java.util.ArrayList;
 import br.com.infoshop.R;
 import br.com.infoshop.holder.HomeProjectsViewHolder;
 import br.com.infoshop.model.Project;
-import br.com.infoshop.ui.home.HomeViewModel;
 import br.com.infoshop.utils.RoundedTransformation;
 
-import static br.com.infoshop.utils.Util.MY_LOG_TAG;
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 import static br.com.infoshop.utils.Util.RSmask;
 
 public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
@@ -33,8 +31,10 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
     private final Context context;
 //    private final HomeViewModel homeViewModel;
 
-//    public HomeProjectsAdapter(ArrayList<Project> itens, Context context, HomeViewModel homeViewModel) {
+    //    public HomeProjectsAdapter(ArrayList<Project> itens, Context context, HomeViewModel homeViewModel) {
     public HomeProjectsAdapter(ArrayList<Project> itens, Context context) {
+        if (itens == null)
+            throw new NullPointerException("Lista de Itens Nula!");
         this.context = context;
         this.itens = itens;
 //        this.homeViewModel = homeViewModel;

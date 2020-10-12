@@ -44,10 +44,10 @@ import br.com.infoshop.ui.projects.ProjectsViewModel;
 import br.com.infoshop.utils.ItemClickSupport;
 import br.com.infoshop.utils.RecyclerItemTouchHelper;
 
-import static br.com.infoshop.utils.Util.MY_LOG_TAG;
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 import static java.lang.Thread.sleep;
 
-public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, IFetchProjects {
+public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, IFetchProjects, SwipeRefreshLayout.OnRefreshListener {
 
     private HomeViewModel homeViewModel;
     private CountDownTimer countdown;
@@ -67,7 +67,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        navController = NavHostFragment.findNavController(this);
         //Handler para manipular UI
         handler = new Handler() {
             @Override
@@ -84,18 +84,14 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             @Override
             public void onFinish() {
                 if (getActivity() != null) {
-                    if (navController != null && navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == R.id.navigation_home) {
+                    if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == R.id.navigation_home) {
                         Toast.makeText(getContext(), "Por favor, aguarde...", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         };
 
-        navController = NavHostFragment.findNavController(this);
-
         projectsViewModel = new ViewModelProvider(requireParentFragment()).get(ProjectsViewModel.class);
-
-        Log.d(MY_LOG_TAG, "Ocorreu a criação HOMEFRAGMENT");
     }
 
     private void updateUI(Message msg) {
@@ -180,8 +176,13 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        //Configura LM do Recycler
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        adapterProjects = new HomeProjectsAdapter(new ArrayList<>(), getContext());
+        adapterProjects.setHasStableIds(true);
+
         navView = getActivity().findViewById(R.id.nav_view);
 
         homeViewModel = new ViewModelProvider(requireParentFragment()).get(HomeViewModel.class);
@@ -195,18 +196,18 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             if (projectsList.size() == 0) {
                 fetchProjects();
             } else {
-                if (recyclerProjects.getVisibility() != View.VISIBLE)
+                adapterProjects.clear();
+                adapterProjects.addAll(projectsList);
+
+                if (recyclerProjects.getVisibility() != View.VISIBLE) {
                     recyclerProjects.setVisibility(View.VISIBLE);
-//                adapterProjects = new HomeProjectsAdapter(projectsList, getContext(), homeViewModel);
-                adapterProjects = new HomeProjectsAdapter(projectsList, getContext());
-                adapterProjects.setHasStableIds(true);
-                linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                recyclerProjects.setLayoutManager(linearLayoutManager);
-//                    recyclerProjects.setHasFixedSize(true);
-                recyclerProjects.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-                recyclerProjects.setItemAnimator(new DefaultItemAnimator());
-                recyclerProjects.setAdapter(adapterProjects);
+                }
+
+                // setRefreshing(false) to signal refresh has finished
+                if (swipeContainer.isRefreshing()) {
+                    swipeContainer.setRefreshing(false);
+                }
+
             }
         });
 
@@ -219,10 +220,25 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         Context context = getContext();
         if (context != null) {
             recyclerProjects = view.findViewById(R.id.recycler_projects_home);
-            swipeContainer = view.findViewById(R.id.layout_swipe_refresh);
-            swipeContainer.setOnRefreshListener(this::fetchProjects);
-            swipeContainer.setColorSchemeResources(R.color.colorAccent);
 
+            recyclerProjects.setLayoutManager(linearLayoutManager);
+            recyclerProjects.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+            recyclerProjects.setItemAnimator(new DefaultItemAnimator());
+            recyclerProjects.setAdapter(adapterProjects);
+
+            swipeContainer = view.findViewById(R.id.layout_swipe_refresh);
+            swipeContainer.setOnRefreshListener(this);
+            swipeContainer.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
+            /**
+             * Showing Swipe Refresh animation on activity create
+             * As animation won't start on onCreate, post runnable is used
+             */
+            swipeContainer.post(() -> {
+                if (swipeContainer != null) {
+                    swipeContainer.setRefreshing(true);
+                }
+                fetchProjects();
+            });
             ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
             new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerProjects);
             ItemClickSupport.addTo(recyclerProjects).setOnItemClickListener((recyclerView, position, v) -> {
@@ -233,7 +249,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
 
     private void fetchProjects() {
         //resgata produtos assíncronamente
-        swipeContainer.setRefreshing(true);
+//        swipeContainer.setRefreshing(true);
         instanceFakeProjects();
         //Inicia counter para timeout
         countdown.start();
@@ -242,23 +258,10 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     @Override
     public void onGetDataDone(ArrayList<Project> projectsList) {
         if (getActivity() != null) {
-            swipeContainer.setRefreshing(false);
-
             //Cancela countdown pois os dados chegaram
             if (countdown != null) {
                 countdown.cancel();
             }
-
-            if (adapterProjects != null) {
-                /** Para uso no SwipeRefresh*/
-                adapterProjects.clear();
-                //Remember to CLEAR OUT old items before appending in the new ones
-                //...the data has come back, add new items to your adapter...
-                adapterProjects.addAll(projectsList);
-                /**Fim Para uso no SwipeRefresh*/
-                // Now we call setRefreshing(false) to signal refresh has finished
-            }
-
             homeViewModel.setProjectsLiveData(projectsList);
         } else {
             Log.e(MY_LOG_TAG, "Activity NULL!");
@@ -284,5 +287,13 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                         adapterProjects.notifyItemRemoved(position);
                     }
                 }).setOnDismissListener(dialog -> adapterProjects.notifyItemChanged(position)).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        if (!swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(true);
+        }
+        fetchProjects();
     }
 }

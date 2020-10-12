@@ -29,7 +29,6 @@ public class ProjectsCategoriesFragment extends Fragment {
     private Button btnCategorie;
     private NavController navController;
 
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_projects_categories, container, false);
         gridViewCategories = root.findViewById(R.id.grid_view_categories);
