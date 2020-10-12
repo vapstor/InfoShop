@@ -42,21 +42,17 @@ public class LoginFragment extends Fragment {
     private AuthViewModel authViewModel;
     private TextInputLayout usernameLayout, passwordLayout;
 
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
-        authViewModel = new ViewModelProvider(requireParentFragment()).get(AuthViewModel.class);
+        navController = NavHostFragment.findNavController(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        navController = NavHostFragment.findNavController(this);
-        return inflater.inflate(R.layout.login_fragment, container, false);
+        loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
+        authViewModel = new ViewModelProvider(requireParentFragment()).get(AuthViewModel.class);
+        return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     @Override
@@ -90,7 +86,6 @@ public class LoginFragment extends Fragment {
             usernameLayout = getActivity().findViewById(R.id.login_username_layout);
             passwordLayout = getActivity().findViewById(R.id.login_password_layout);
 
-
             loginButton = getActivity().findViewById(R.id.btn_login);
             loginProgressBar = getActivity().findViewById(R.id.login_progress_bar);
             linkSignup = getActivity().findViewById(R.id.link_signup);
@@ -114,13 +109,13 @@ public class LoginFragment extends Fragment {
             };
             usernameEditText.addTextChangedListener(afterTextChangedListener);
             passwordEditText.addTextChangedListener(afterTextChangedListener);
-            passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
-                }
-                return false;
-            });
+//            passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
+//                if (actionId == EditorInfo.IME_ACTION_DONE) {
+//                    loginViewModel.login(usernameEditText.getText().toString(),
+//                            passwordEditText.getText().toString());
+//                }
+//                return false;
+//            });
 
             loginButton.setOnClickListener(v -> {
                 authViewModel.login(usernameEditText.getText().toString(), passwordEditText.getText().toString());

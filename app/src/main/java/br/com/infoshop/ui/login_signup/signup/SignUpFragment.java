@@ -60,7 +60,7 @@ public class SignUpFragment extends Fragment {
         ViewModelStoreOwner owner = navController.getViewModelStoreOwner(R.id.navigation_login_signup);
         signupViewModel = new ViewModelProvider(owner).get(SignUpViewModel.class);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        return inflater.inflate(R.layout.sign_up_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_signup, container, false);
     }
 
     @Override

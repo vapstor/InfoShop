@@ -9,7 +9,7 @@
         android:id="@+id/navigation_signup"
         android:name="br.com.infoshop.ui.login_signup.signup.SignUpFragment"
         android:label="@string/cadastrar"
-        tools:layout="@layout/sign_up_fragment">
+        tools:layout="@layout/fragment_signup">
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"
             app:destination="@id/navigation_login"
@@ -23,7 +23,7 @@
         android:id="@+id/navigation_login"
         android:name="br.com.infoshop.ui.login_signup.login.LoginFragment"
         android:label="@string/entrar"
-        tools:layout="@layout/login_fragment">
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_signUp"
             app:destination="@id/navigation_signup"
