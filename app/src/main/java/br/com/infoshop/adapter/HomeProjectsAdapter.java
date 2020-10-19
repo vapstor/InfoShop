@@ -27,7 +27,7 @@ import static br.com.infoshop.utils.Util.RSmask;
 
 public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
 
-    private final ArrayList<Project> itens;
+    private ArrayList<Project> itens;
     private final Context context;
 //    private final HomeViewModel homeViewModel;
 
@@ -53,19 +53,19 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
         Project item = itens.get(position);
         //Titulo
         TextView titulo = holder.tituloDoProjeto;
-        titulo.setText(item.getTitle());
+        titulo.setText(item.getTitulo());
 
         //Descrição
         TextView descricao = holder.descricaoDoProjeto;
-        descricao.setText(item.getDescription());
+        descricao.setText(item.getDescricao());
 
         //Preço
         TextView preco = holder.precoItemProduto;
-        preco.setText(RSmask(item.getPrice()));
+        preco.setText(RSmask(item.getPreco()));
 
         //Imagem
         ImageView imagemItem = holder.imgProduto;
-        String url = "https://www.royalfarma.com.br/uploads/" + item.getImagePath();
+        String url = "https://www.royalfarma.com.br/uploads/" + item.getImagem();
 
         //LOADER
         final ProgressBar progressView = holder.progressBar;
@@ -87,7 +87,7 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
             }
         };
         imagemItem.setTag(loadedCallback);
-        if (item.getImagePath() == null || item.getImagePath().equals("")) {
+        if (item.getImagem() == null || item.getImagem().equals("")) {
             url = "drawable/empty_image_placeholder";
             int productImageId = this.context.getResources().getIdentifier(url, "drawable", context.getPackageName());
             Picasso.get()
@@ -97,7 +97,7 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
                     .into(imagemItem, loadedCallback);
         } else {
             Log.d(MY_LOG_TAG, "URL: " + url);
-            Log.d(MY_LOG_TAG, "Product Image URL DB: " + item.getImagePath());
+            Log.d(MY_LOG_TAG, "Product Image URL DB: " + item.getImagem());
             Picasso.get()
                     .load(url)
                     .transform(new RoundedTransformation(15, 0))
@@ -129,5 +129,10 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
     @Override
     public long getItemId(int position) {
         return itens.get(position).getId();
+    }
+
+    public void updateProjectsList(ArrayList<Project> projects) {
+        this.itens = projects;
+        notifyDataSetChanged();
     }
 }

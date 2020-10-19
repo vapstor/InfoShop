@@ -1,13 +1,11 @@
 package br.com.infoshop;
 
 import android.app.Application;
-import android.os.StrictMode;
 import android.util.Log;
 
 import dagger.hilt.android.HiltAndroidApp;
 
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
-
 
 @HiltAndroidApp
 public class MainApplication extends Application {

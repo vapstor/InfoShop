@@ -1,8 +1,6 @@
 package br.com.infoshop.adapter;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,19 +9,15 @@ import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
 
 import br.com.infoshop.R;
 import br.com.infoshop.model.Categorie;
 
-import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
-
 public class ProjectsCategoriesAdapter extends BaseAdapter {
     private final Context context;
-    private final ArrayList<Categorie> categories;
+    private ArrayList<Categorie> categories;
 
     public ProjectsCategoriesAdapter(ArrayList<Categorie> categories, Context context) {
         this.categories = categories;
@@ -60,7 +54,11 @@ public class ProjectsCategoriesAdapter extends BaseAdapter {
 
         //Imagem
         ConstraintLayout root = convertView.findViewById(R.id.container_image_item_categorie);
-        root.setBackground(ResourcesCompat.getDrawable(context.getResources(), categorie.getBackgroundImagePath(), null));
+        String bg = categorie.getBackgroundImagePath();
+        if (bg != null && !bg.equals("")) {
+            root.setBackground(ResourcesCompat.getDrawable(context.getResources(), Integer.parseInt(bg), null));
+        }
+
 
 //        convertView.setOnClickListener(v -> {
 //            NavHostFragment navHostFragment = (NavHostFragment) ((FragmentActivity) context).getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
@@ -74,5 +72,10 @@ public class ProjectsCategoriesAdapter extends BaseAdapter {
 //        });
 
         return convertView;
+    }
+
+    public void updateList(ArrayList<Categorie> updatedList) {
+        this.categories = updatedList;
+        notifyDataSetChanged();
     }
 }

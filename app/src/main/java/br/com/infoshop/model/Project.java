@@ -1,16 +1,23 @@
 package br.com.infoshop.model;
 
-public class Project {
-    private int id;
-    private String title, description, imagePath;
-    private double price;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-    public Project(int id, String title, String description, double price, String imagePath) {
+public class Project implements Parcelable {
+    private int id;
+    private int id_categoria;
+    private String titulo, descricao, imagem;
+    private double preco;
+
+    public Project() {    }
+
+    public Project(int id, int id_categoria, String titulo, String descricao, double preco, String imagem) {
         this.id = id;
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.imagePath = imagePath;
+        this.id_categoria = id_categoria;
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.imagem = imagem;
     }
 
     public int getId() {
@@ -21,35 +28,85 @@ public class Project {
         this.id = ItemId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    public double getPrice() {
-        return price;
+    public double getPreco() {
+        return preco;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setPreco(double preco) {
+        this.preco = preco;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getImagem() {
+        return imagem;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
+
+    public int getId_categoria() {
+        return id_categoria;
+    }
+
+    public void setId_categoria(int id_categoria) {
+        this.id_categoria = id_categoria;
+    }
+
+
+    /**
+     * PARCELABLE
+     **/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeInt(id_categoria);
+        dest.writeString(titulo);
+        dest.writeString(descricao);
+        dest.writeDouble(preco);
+        dest.writeString(imagem);
+    }
+
+    public static final Creator<Project> CREATOR = new Creator<Project>() {
+        @Override
+        public Project createFromParcel(Parcel in) {
+            return new Project(in);
+        }
+
+        @Override
+        public Project[] newArray(int size) {
+            return new Project[size];
+        }
+    };
+
+    private Project(Parcel in) {
+        id = in.readInt();
+        id_categoria = in.readInt();
+        titulo = in.readString();
+        descricao = in.readString();
+        preco = in.readDouble();
+        imagem = in.readString();
     }
 }

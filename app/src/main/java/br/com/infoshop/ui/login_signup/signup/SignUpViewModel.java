@@ -6,16 +6,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import javax.inject.Inject;
-
 import br.com.infoshop.R;
-import br.com.infoshop.model.User;
 import br.com.infoshop.repository.FirebaseRepository;
 
 public class SignUpViewModel extends ViewModel {
     private MutableLiveData<SignUpFormState> signUpFormStateLiveData;
     private MutableLiveData<Boolean> isDataValidLiveData;
-    private MutableLiveData<Boolean> isSignupInProcess;
     FirebaseRepository firebaseRepository;
 
     public SignUpViewModel() {
@@ -23,14 +19,8 @@ public class SignUpViewModel extends ViewModel {
         signUpFormStateLiveData.setValue(null);
         isDataValidLiveData = new MutableLiveData<>();
         isDataValidLiveData.setValue(false);
-        isSignupInProcess = new MutableLiveData<>();
-        isSignupInProcess.setValue(false);
     }
 
-
-    public MutableLiveData<Boolean> getIsSignupInProcess() {
-        return isSignupInProcess;
-    }
 
     LiveData<SignUpFormState> getSignupFormState() {
         return signUpFormStateLiveData;
@@ -45,7 +35,7 @@ public class SignUpViewModel extends ViewModel {
         } else if (!isUserNameValid(username)) {
             signUpFormStateLiveData.setValue(
                     updateSignupFormStateWithUserInfo(
-                            new SignUpFormState(null, R.string.invalid_username, null, null, null, null),
+                            new SignUpFormState(null, R.string.invalid_email, null, null, null, null),
                             name, username, email, pass, address, phone));
         } else if (!isEmailValid(email)) {
             signUpFormStateLiveData.setValue(

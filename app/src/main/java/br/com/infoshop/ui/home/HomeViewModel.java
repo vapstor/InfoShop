@@ -1,28 +1,20 @@
 package br.com.infoshop.ui.home;
 
-import android.util.Log;
-
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import br.com.infoshop.model.Project;
-
-import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
+import br.com.infoshop.repository.FirebaseRepository;
 
 public class HomeViewModel extends ViewModel {
+    private MutableLiveData<String> boasVindasMessageLiveData = new MutableLiveData<>();
 
-    private MutableLiveData<String> boasVindasMessageLiveData;
-    private MutableLiveData<ArrayList<Project>> projectsLiveData;
-
+    @ViewModelInject
     public HomeViewModel() {
-        boasVindasMessageLiveData = new MutableLiveData<>();
-        projectsLiveData = new MutableLiveData<>();
         setBoasVindasMessageLiveData(welcomeMessage(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)));
-        setProjectsLiveData(new ArrayList<>());
     }
 
     private String welcomeMessage(int hour) {
@@ -35,29 +27,13 @@ public class HomeViewModel extends ViewModel {
         }
     }
 
-    public LiveData<String> getBoasVindasMessageLiveData() {
-        return boasVindasMessageLiveData;
-    }
-
     protected void setBoasVindasMessageLiveData(String message) {
         boasVindasMessageLiveData.setValue(message);
     }
 
-    public LiveData<ArrayList<Project>> getProjectsLiveData() {
-        return projectsLiveData;
+    public LiveData<String> getBoasVindasMessageLiveData() {
+        return boasVindasMessageLiveData;
     }
 
-    public void setProjectsLiveData(ArrayList<Project> projects) {
-        projectsLiveData.setValue(projects);
-    }
 
-    public void removeProject(Project project) {
-        ArrayList<Project> projects = projectsLiveData.getValue();
-        if (projects != null && projects.size() > 0) {
-            projects.remove(project);
-            setProjectsLiveData(projects);
-        } else {
-            Log.e(MY_LOG_TAG, "ERRO: Projeto não está na lista!");
-        }
-    }
 }

@@ -10,13 +10,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
-        android:paddingTop="16dp"
+        android:orientation="vertical"
         android:paddingLeft="36dp"
+        android:paddingTop="16dp"
         android:paddingRight="36dp"
-        android:paddingBottom="16dp"
-        >
+        android:paddingBottom="16dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -41,7 +40,7 @@
                 android:drawablePadding="10dp"
                 android:drawableTint="?attr/colorControlNormal"
                 android:fontFamily="@font/roboto_light"
-                android:hint="@string/username_ou_email"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 

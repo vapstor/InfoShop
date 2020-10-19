@@ -109,13 +109,12 @@ public class LoginFragment extends Fragment {
             };
             usernameEditText.addTextChangedListener(afterTextChangedListener);
             passwordEditText.addTextChangedListener(afterTextChangedListener);
-//            passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
-//                if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    loginViewModel.login(usernameEditText.getText().toString(),
-//                            passwordEditText.getText().toString());
-//                }
-//                return false;
-//            });
+            passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    authViewModel.login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                }
+                return false;
+            });
 
             loginButton.setOnClickListener(v -> {
                 authViewModel.login(usernameEditText.getText().toString(), passwordEditText.getText().toString());
@@ -125,7 +124,7 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getContext(), "Bem vindo, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getActivity(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     } else {
-                        Toast.makeText(getContext(), "Não logou!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Falha ao logar!", Toast.LENGTH_SHORT).show();
                     }
                 });
             });

@@ -29,7 +29,8 @@ public class AuthViewModel extends AndroidViewModel {
 
     public AuthViewModel(Application application) {
         super(application);
-        authRepository = new FirebaseRepository();
+        this.authRepository = new FirebaseRepository();
+        this.loggedUserLiveData = new MutableLiveData<>();
     }
 
     public void createUser(User user) {
@@ -48,5 +49,10 @@ public class AuthViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> getIsLoading() {
         return isLoading;
+    }
+
+    public void logout() {
+        authRepository.auth.signOut();
+        loggedUserLiveData.setValue(null);
     }
 }

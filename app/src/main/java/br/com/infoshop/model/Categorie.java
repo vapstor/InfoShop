@@ -3,9 +3,9 @@ package br.com.infoshop.model;
 public class Categorie {
     private String title;
     private int id;
-    private int backgroundImagePath;
+    private String backgroundImagePath;
 
-    public Categorie(int id, String title, int backgroundImagePath) {
+    public Categorie(int id, String title, String backgroundImagePath) {
         this.id = id;
         this.title = title;
         this.backgroundImagePath = backgroundImagePath;
@@ -28,11 +28,11 @@ public class Categorie {
         this.title = title;
     }
 
-    public int getBackgroundImagePath() {
+    public String getBackgroundImagePath() {
         return backgroundImagePath;
     }
 
-    public void setBackgroundImagePath(int backgroundImagePath) {
+    public void setBackgroundImagePath(String backgroundImagePath) {
         this.backgroundImagePath = backgroundImagePath;
     }
 }

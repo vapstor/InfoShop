@@ -3,6 +3,7 @@ package br.com.infoshop.activities;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -12,25 +13,23 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import br.com.infoshop.R;
-import br.com.infoshop.ui.login_signup.login.LoginViewModel;
+import br.com.infoshop.auth.AuthViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
 
-
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
-
-    private LoginViewModel loginViewModel;
+    private NavController navController;
+    private NavHostFragment navHostFragment;
+    private AuthViewModel authViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         //observa mudanças no objeto firebase user
-        loginViewModel.getLoggedUserLiveData().observe(this, firebaseUser -> {
+        authViewModel.getLoggedUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser == null) {
                 startActivity(new Intent(this, LoginOrSignUpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
@@ -46,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(R.id.navigation_profile, R.id.navigation_home, R.id.navigation_projects_categories).build();
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController;
+        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -88,6 +87,23 @@ public class MainActivity extends AppCompatActivity {
                     default: //do nothing to ignore reselect
                 }
             });
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (navHostFragment != null) {
+            int backstack = navHostFragment.getChildFragmentManager().getBackStackEntryCount();
+            if (backstack == 0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Logout")
+                        .setMessage("Você deseja realmente sair?")
+                        .setPositiveButton("Sair", (dialog, id) -> authViewModel.logout())
+                        .setNegativeButton("Cancelar", (dialog, id) -> { });
+                builder.create().show();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 }
