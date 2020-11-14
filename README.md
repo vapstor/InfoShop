@@ -57,7 +57,7 @@
   - [x] Home
   - [x] Projetos
 - [ ] Configurar pesquisa na aba Projetos
-- [ ] Permitir salvar/excluir projetos favoritos
+- [x] Permitir salvar/excluir projetos favoritos
 
 * Desenvolver LoginPage ["LOGIN"]
 
@@ -73,9 +73,9 @@
   -  [x] Implementar views de boas-vindas dinâmica
   -  [x] Implementar Bottom Navigation
   -  [x] Implementar Layout do item projeto
-  -  [ ] Implementar EndlessScrollView para lista de projetos
+  -  [x] Implementar EndlessScrollView para lista de projetos
   -  [x] Implementar SwipeRefresh para a lista de projetos
-  -  [ ] Implementar detalhamento ao clicar no Produto
+  -  [x] Implementar detalhamento ao clicar no Produto
   -  [x] Implementar Swipe para excluir um item indesejável da lista
   -  [x] Implementar Ordenação por "Preço" na lista de projetos
   
@@ -90,7 +90,7 @@
 * Desenvolver ProjetosPage ["Projetos"]
   * Desenvolver CategoriasFragment
     - [x] Implementar gridview (4) categorias
-    - [ ] Implementar GET firebase 
+    - [x] Implementar GET firebase 
   * Desenvolver ProjetosFragment
     - [ ] Implementar SearchBar ("Busque um projeto...")
     - [ ] Implementar pesquisa por nome/descrição de projeto (regex)
