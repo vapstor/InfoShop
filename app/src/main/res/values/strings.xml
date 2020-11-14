@@ -20,11 +20,12 @@
     <string name="lorem_ipsum_1p">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse libero massa, fermentum a erat dapibus, sagittis bibendum dolor. Vivamus scelerisque, est id blandit sodales, augue lectus elementum ex, eu laoreet mi arcu sit amet nisi. Morbi hendrerit enim sit amet eros aliquam blandit. Aenean iaculis, sem id feugiat dapibus, sapien ligula faucibus metus, sed porttitor libero purus sed felis. Vivamus libero turpis, elementum vel varius vel, eleifend at est. Maecenas in congue libero, ac pellentesque tellus. Proin convallis nibh odio, et placerat purus congue at. Nullam tempus metus mauris, eu convallis orci cursus nec. Aenean turpis nisi, sollicitudin lobortis erat eu, ornare bibendum ante. Pellentesque ut orci lobortis, varius dui et, hendrerit lacus. Ut vel venenatis ex. Sed egestas, dui ut imperdiet tempus, libero urna ultricies purus, nec iaculis est enim in metus. Aliquam erat volutpat.</string>
     <string name="nao_e_util">Não é Útil</string>
     <string name="mensagem">Mensagem</string>
-    <string name="sem_projetos_contate_o_adm">Sem projetos!\nContate o administrador.</string>
+    <string name="sem_projetos">Sem projetos!</string>
     <string name="tentar_novamente">Tentar Novamente</string>
     <string name="refresh_projects">Refresh Projects</string>
     <string name="excluir">Excluir</string>
     <string name="voce_tem_certeza_que_nao_deseja_mais_ver_este_projeto">Você tem certeza que não deseja mais ver este projeto?</string>
+    <string name="voce_tem_certeza_que_deseja_desfavoritar_este_projeto">Você tem certeza que deseja desfavoritar este projeto?</string>
     <string name="cancelar">Cancelar</string>
     <string name="categoria">Categoria</string>
     <string name="projects_categories">Categorias</string>
@@ -134,4 +135,7 @@
     </string>
     <string name="action_settings">Settings</string>
     <string name="titulo_do_projeto">Titulo do projeto</string>
+    <string name="titulo_ou_descricao">Título ou descrição....</string>
+    <string name="favoritos">Favoritos</string>
+    <string name="Desfavoritar">Desfavoritar</string>
 </resources>

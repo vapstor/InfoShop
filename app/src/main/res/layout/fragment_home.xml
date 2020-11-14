@@ -92,7 +92,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/roboto_light"
                     android:gravity="center"
-                    android:text="@string/sem_projetos_contate_o_adm"
+                    android:text="@string/sem_projetos"
                     android:textColor="#848484"
                     android:textSize="15sp"
                     app:layout_constraintEnd_toEndOf="@+id/image_view_no_projects"

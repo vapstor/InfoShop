@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseUser;
 
 import br.com.infoshop.R;
-import br.com.infoshop.ui.login_signup.login.LoginViewModel;
+import br.com.infoshop.viewmodel.LoginViewModel;
 
 import static java.lang.Thread.sleep;
 

@@ -1,4 +1,4 @@
-package br.com.infoshop.ui.home;
+package br.com.infoshop.viewmodel;
 
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
@@ -17,7 +17,7 @@ public class HomeViewModel extends ViewModel {
         setBoasVindasMessageLiveData(welcomeMessage(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)));
     }
 
-    private String welcomeMessage(int hour) {
+    public String welcomeMessage(int hour) {
         if (hour >= 6 && hour <= 12) {
             return "Bom dia, ";
         } else if (hour > 12 && hour <= 18) {
@@ -27,7 +27,7 @@ public class HomeViewModel extends ViewModel {
         }
     }
 
-    protected void setBoasVindasMessageLiveData(String message) {
+    public void setBoasVindasMessageLiveData(String message) {
         boasVindasMessageLiveData.setValue(message);
     }
 

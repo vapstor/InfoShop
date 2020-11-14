@@ -1,23 +1,35 @@
-package br.com.infoshop.auth;
+package br.com.infoshop.viewmodel;
 
 
 import android.app.Application;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.firebase.auth.FirebaseUser;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import br.com.infoshop.model.User;
 import br.com.infoshop.repository.FirebaseRepository;
 
+@Singleton
 public class AuthViewModel extends AndroidViewModel {
     private FirebaseRepository authRepository;
-    LiveData<User> createdUserLiveData;
-    MutableLiveData<FirebaseUser> loggedUserLiveData;
+    public LiveData<User> createdUserLiveData;
 
-    public MutableLiveData<FirebaseUser> getLoggedUserLiveData() {
+    @ViewModelInject
+    @Inject
+    public AuthViewModel(Application application) {
+        super(application);
+        this.authRepository = new FirebaseRepository();
+        this.loggedUserLiveData = new MutableLiveData<>();
+    }
+
+    public MutableLiveData<User> loggedUserLiveData;
+
+    public MutableLiveData<User> getLoggedUserLiveData() {
         return loggedUserLiveData;
     }
 
@@ -25,12 +37,6 @@ public class AuthViewModel extends AndroidViewModel {
 
     public LiveData<User> getCreatedUserLiveData() {
         return createdUserLiveData;
-    }
-
-    public AuthViewModel(Application application) {
-        super(application);
-        this.authRepository = new FirebaseRepository();
-        this.loggedUserLiveData = new MutableLiveData<>();
     }
 
     public void createUser(User user) {

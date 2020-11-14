@@ -1,4 +1,4 @@
-package br.com.infoshop.ui.login_signup.signup;
+package br.com.infoshop.viewmodel;
 
 import android.util.Patterns;
 
@@ -7,12 +7,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import br.com.infoshop.R;
-import br.com.infoshop.repository.FirebaseRepository;
+import br.com.infoshop.ui.login_signup.signup.SignUpFormState;
 
 public class SignUpViewModel extends ViewModel {
     private MutableLiveData<SignUpFormState> signUpFormStateLiveData;
     private MutableLiveData<Boolean> isDataValidLiveData;
-    FirebaseRepository firebaseRepository;
 
     public SignUpViewModel() {
         signUpFormStateLiveData = new MutableLiveData<>();
@@ -22,7 +21,7 @@ public class SignUpViewModel extends ViewModel {
     }
 
 
-    LiveData<SignUpFormState> getSignupFormState() {
+    public LiveData<SignUpFormState> getSignupFormState() {
         return signUpFormStateLiveData;
     }
 
@@ -62,15 +61,15 @@ public class SignUpViewModel extends ViewModel {
         }
     }
 
-    private boolean isPhoneValid(String phone) {
+    public boolean isPhoneValid(String phone) {
         return phone != null && phone.length() > 0;
     }
 
-    private boolean isAddressValid(String address) {
+    public boolean isAddressValid(String address) {
         return address != null && address.length() > 0;
     }
 
-    private SignUpFormState updateSignupFormStateWithUserInfo(SignUpFormState signUpFormState, String name, String username, String email, String pass, String address, String phone) {
+    public SignUpFormState updateSignupFormStateWithUserInfo(SignUpFormState signUpFormState, String name, String username, String email, String pass, String address, String phone) {
         signUpFormState.setName(name);
         signUpFormState.setUsername(username);
         signUpFormState.setEmail(email);
@@ -89,7 +88,7 @@ public class SignUpViewModel extends ViewModel {
     }
 
     // A placeholder email validation check
-    private boolean isEmailValid(String email) {
+    public boolean isEmailValid(String email) {
         if (email == null) {
             return false;
         }
@@ -101,7 +100,7 @@ public class SignUpViewModel extends ViewModel {
     }
 
     // A placeholder password validation check
-    private boolean isPasswordValid(String password) {
+    public boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
     }
 }

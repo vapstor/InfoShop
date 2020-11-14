@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 /**
  * Data validation state of the login form.
  */
-class SignUpFormState {
+public class SignUpFormState {
 
     @Nullable
     private Integer nameError, usernameError, emailError, passwordError, addressError, phoneError;
@@ -13,7 +13,7 @@ class SignUpFormState {
     private boolean isDataValid;
 
 
-    SignUpFormState(@Nullable Integer nameError, @Nullable Integer usernameError, @Nullable Integer emailError, @Nullable Integer passwordError, @Nullable Integer addressError, @Nullable Integer phoneError) {
+    public SignUpFormState(@Nullable Integer nameError, @Nullable Integer usernameError, @Nullable Integer emailError, @Nullable Integer passwordError, @Nullable Integer addressError, @Nullable Integer phoneError) {
         this.nameError = nameError;
         this.usernameError = usernameError;
         this.emailError = emailError;
@@ -23,7 +23,7 @@ class SignUpFormState {
         this.isDataValid = false;
     }
 
-    SignUpFormState(boolean isDataValid) {
+    public SignUpFormState(boolean isDataValid) {
         this.nameError = null;
         this.usernameError = null;
         this.emailError = null;
@@ -34,27 +34,27 @@ class SignUpFormState {
     }
 
     @Nullable
-    Integer getNameError() {
+    public Integer getNameError() {
         return nameError;
     }
 
     @Nullable
-    Integer getEmailError() {
+    public Integer getEmailError() {
         return emailError;
     }
 
     @Nullable
-    Integer getUsernameError() {
+    public Integer getUsernameError() {
         return usernameError;
     }
 
     @Nullable
-    Integer getPasswordError() {
+    public Integer getPasswordError() {
         return passwordError;
     }
 
     @Nullable
-    Integer getAddressError() {
+    public Integer getAddressError() {
         return addressError;
     }
 
@@ -63,10 +63,9 @@ class SignUpFormState {
         return phoneError;
     }
 
-    boolean isDataValid() {
+    public boolean isDataValid() {
         return isDataValid;
     }
-
 
     public String getName() {
         return name;

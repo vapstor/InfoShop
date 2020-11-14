@@ -74,6 +74,8 @@
                 android:id="@+id/btn_login"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
+                android:alpha="0.7"
+                android:enabled="false"
                 android:text="@string/entrar"
                 android:theme="@style/ButtonPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -25,14 +25,14 @@ import br.com.infoshop.utils.RoundedTransformation;
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 import static br.com.infoshop.utils.Util.RSmask;
 
-public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
+public class FavsProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
 
     private ArrayList<Project> itens;
     private final Context context;
 //    private final HomeViewModel homeViewModel;
 
     //    public HomeProjectsAdapter(ArrayList<Project> itens, Context context, HomeViewModel homeViewModel) {
-    public HomeProjectsAdapter(ArrayList<Project> itens, Context context) {
+    public FavsProjectsAdapter(ArrayList<Project> itens, Context context) {
         if (itens == null)
             throw new NullPointerException("Lista de Itens Nula!");
         this.context = context;
@@ -43,7 +43,7 @@ public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
     @NonNull
     @Override
     public HomeProjectsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.layout_home_recycler_project_item_, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_profile_recycler_fav_project_item_, parent, false);
         return new HomeProjectsViewHolder(view);
     }
 

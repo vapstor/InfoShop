@@ -20,7 +20,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.transition.Fade;
@@ -28,18 +27,25 @@ import androidx.transition.TransitionManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import javax.inject.Inject;
+
 import br.com.infoshop.R;
 import br.com.infoshop.activities.MainActivity;
-import br.com.infoshop.auth.AuthViewModel;
+import br.com.infoshop.viewmodel.AuthViewModel;
+import br.com.infoshop.viewmodel.LoginViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class LoginFragment extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
     private ProgressBar loginProgressBar;
-    private LoginViewModel loginViewModel;
+    @Inject
+    public LoginViewModel loginViewModel;
     private TextView linkSignup;
     private NavController navController;
-    private AuthViewModel authViewModel;
+    @Inject
+    public AuthViewModel authViewModel;
     private TextInputLayout usernameLayout, passwordLayout;
 
     @Override
@@ -50,8 +56,6 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
-        authViewModel = new ViewModelProvider(requireParentFragment()).get(AuthViewModel.class);
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -121,7 +125,7 @@ public class LoginFragment extends Fragment {
                 authViewModel.getLoggedUserLiveData().observe(getViewLifecycleOwner(), user -> {
                     authViewModel.setLoading(false);
                     if (user != null) {
-                        Toast.makeText(getContext(), "Bem vindo, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Bem vindo, " + user.getName(), Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getActivity(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     } else {
                         Toast.makeText(getContext(), "Falha ao logar!", Toast.LENGTH_SHORT).show();
@@ -133,8 +137,6 @@ public class LoginFragment extends Fragment {
 
             loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), loginFormState -> {
                 if (loginFormState == null) {
-                    loginButton.setEnabled(false);
-                    loginButton.setAlpha((float) 0.70);
                     return;
                 }
                 if (!loginFormState.isDataValid()) {

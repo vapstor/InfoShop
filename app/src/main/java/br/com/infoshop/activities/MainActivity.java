@@ -14,24 +14,33 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import javax.inject.Inject;
+
 import br.com.infoshop.R;
-import br.com.infoshop.auth.AuthViewModel;
+import br.com.infoshop.viewmodel.AuthViewModel;
+import br.com.infoshop.viewmodel.LoginViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private NavHostFragment navHostFragment;
-    private AuthViewModel authViewModel;
+    @Inject
+    public AuthViewModel authViewModel;
+    @Inject
+    public LoginViewModel loginViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         //observa mudanças no objeto firebase user
         authViewModel.getLoggedUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser == null) {
                 startActivity(new Intent(this, LoginOrSignUpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            } else {
+
             }
         });
 

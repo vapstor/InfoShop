@@ -27,9 +27,9 @@ import androidx.transition.TransitionManager;
 import com.google.android.material.textfield.TextInputLayout;
 
 import br.com.infoshop.R;
-import br.com.infoshop.auth.AuthViewModel;
+import br.com.infoshop.viewmodel.AuthViewModel;
 import br.com.infoshop.model.User;
-import br.com.infoshop.repository.FirebaseRepository;
+import br.com.infoshop.viewmodel.SignUpViewModel;
 
 public class SignUpFragment extends Fragment {
     private AuthViewModel authViewModel;

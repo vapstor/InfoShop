@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import br.com.infoshop.R;
 import br.com.infoshop.adapter.ProjectsCategoriesAdapter;
 import br.com.infoshop.model.Categorie;
+import br.com.infoshop.viewmodel.ProjectsViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint

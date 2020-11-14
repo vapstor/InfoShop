@@ -6,6 +6,7 @@
     <color name="colorSecondary">#FFFFA5</color>
     <color name="colorSecondaryDark">#F5D400</color>
     <color name="colorAccent">#83169C</color>
+    <color name="colorAccentDisabled">#8583169C</color>
     <color name="white">#FFF</color>
     <color name="red">#ff0000</color>
     <color name="black">#000</color>
