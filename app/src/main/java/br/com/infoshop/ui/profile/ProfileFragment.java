@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -30,7 +31,9 @@ import javax.inject.Inject;
 import br.com.infoshop.R;
 import br.com.infoshop.activities.ProjectDetailActivity;
 import br.com.infoshop.adapter.FavsProjectsAdapter;
+import br.com.infoshop.interfaces.IUnfavClick;
 import br.com.infoshop.model.Project;
+import br.com.infoshop.model.User;
 import br.com.infoshop.utils.ItemClickSupport;
 import br.com.infoshop.utils.RecyclerItemTouchHelper;
 import br.com.infoshop.viewmodel.AuthViewModel;
@@ -40,8 +43,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 
 @AndroidEntryPoint
-public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener {
-    private TextView nameTv, usernameTv, emailTv, telTv, enderecoTv;
+public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, SwipeRefreshLayout.OnRefreshListener, IUnfavClick {
+    private TextView nameTv, usernameTv, emailTv, telTv, enderecoTv, totalFavsPrice;
     private RecyclerView recyclerFavs;
     @Inject
     public AuthViewModel authViewModel;
@@ -49,12 +52,14 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
     public ProjectsViewModel projectsViewModel;
     private SwipeRefreshLayout swipeContainer;
     private FavsProjectsAdapter adapterFavsProjects;
+    private ConstraintLayout backgroundNoProjects;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
         initViews(root);
         observeUserInfos();
         observeFavoritesList();
+        observeFavoritesValue();
 
         return root;
     }
@@ -63,9 +68,10 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         configRecycler();
-
+        configProfile();
         swipeContainer.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
-//        swipeContainer.post(this::onRefresh);
+        swipeContainer.post(this::onRefresh);
+
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerFavs);
@@ -89,13 +95,24 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
 //        }
 //    }
 
+    private void configProfile() {
+        User user = authViewModel.getLoggedUserLiveData().getValue();
+        if (user != null) {
+            nameTv.setText(user.getName());
+            usernameTv.setText("Usuário: @" + user.getUsername());
+            emailTv.setText("E-mail: " + user.getEmail());
+            telTv.setText("Telefone: " + user.getPhone());
+            enderecoTv.setText("Endereço: " + user.getAddress());
+        }
+    }
+
     private void configRecycler() {
         if (getContext() != null) {
             recyclerFavs.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerFavs.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
             recyclerFavs.setItemAnimator(new DefaultItemAnimator());
 
-            adapterFavsProjects = new FavsProjectsAdapter(new ArrayList<>(), getContext());
+            adapterFavsProjects = new FavsProjectsAdapter(new ArrayList<>(), getContext(), this);
             adapterFavsProjects.setHasStableIds(true);
 
             recyclerFavs.setAdapter(adapterFavsProjects);
@@ -104,19 +121,37 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
         }
     }
 
+    private void observeFavoritesValue() {
+        projectsViewModel.getTotalFavPriceLiveData().observe(getViewLifecycleOwner(), valor -> {
+            totalFavsPrice.setText(valor);
+        });
+    }
+
     private void observeFavoritesList() {
         projectsViewModel.getFavoritesLiveData().observe(getViewLifecycleOwner(), projects -> {
-            adapterFavsProjects.updateProjectsList(projects);
-            if (recyclerFavs.getVisibility() != View.VISIBLE) {
-                recyclerFavs.setVisibility(View.VISIBLE);
+            if (projects == null || projects.size() == 0) {
+                if (recyclerFavs.getVisibility() == View.VISIBLE)
+                    recyclerFavs.setVisibility(View.GONE);
+                if (backgroundNoProjects.getVisibility() != View.VISIBLE)
+                    backgroundNoProjects.setVisibility(View.VISIBLE);
+            } else {
+                adapterFavsProjects.updateProjectsList(projects);
+                if (recyclerFavs.getVisibility() != View.VISIBLE)
+                    recyclerFavs.setVisibility(View.VISIBLE);
+                if (backgroundNoProjects.getVisibility() == View.VISIBLE)
+                    backgroundNoProjects.setVisibility(View.GONE);
             }
             // setRefreshing(false) to signal refresh has finished
             if (swipeContainer.isRefreshing()) {
                 swipeContainer.setRefreshing(false);
             }
+            //atualiza preço com base na ultima atualização ouvida
+            projectsViewModel.calculateFavoritesTotalPrice();
         });
     }
 
+    //Observador para caso queira implementar real-time do Firebase ou um adicional ex.: editarPerfil()
+    //Implementado mas não utilizado pois atualiza a partir de cada entrada no fragment (configProfile())
     private void observeUserInfos() {
         authViewModel.getLoggedUserLiveData().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
@@ -138,7 +173,9 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
         telTv = root.findViewById(R.id.profile_tel_tv);
         enderecoTv = root.findViewById(R.id.profile_endereco_tv);
         recyclerFavs = root.findViewById(R.id.favs_recycler);
+        totalFavsPrice = root.findViewById(R.id.fav_total_price);
         swipeContainer = root.findViewById(R.id.layout_swipe_refresh);
+        backgroundNoProjects = root.findViewById(R.id.layout_background_home_recycler);
         swipeContainer.setOnRefreshListener(this);
     }
 
@@ -150,6 +187,7 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
         //busca favoritos
         projectsViewModel.fetchFavorites();
     }
+
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
@@ -174,5 +212,12 @@ public class ProfileFragment extends Fragment implements RecyclerItemTouchHelper
                         Log.e(MY_LOG_TAG, "Lista de projetos nula!");
                     }
                 }).setOnDismissListener(dialog -> adapterFavsProjects.notifyItemChanged(position)).show();
+    }
+
+    @Override
+    public void onUnfav(int position) {
+        swipeContainer.setRefreshing(true);
+        Project project = Objects.requireNonNull(projectsViewModel.getFavoritesLiveData().getValue()).get(position);
+        projectsViewModel.removeFavorite(project);
     }
 }

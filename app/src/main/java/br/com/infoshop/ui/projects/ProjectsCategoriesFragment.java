@@ -42,9 +42,7 @@ public class ProjectsCategoriesFragment extends Fragment {
 
             Bundle bundle = new Bundle();
             bundle.putInt("categoryId", categorie.getId());
-            Toast.makeText(getContext(), "Category Id " + categorie.getId(), Toast.LENGTH_SHORT).show();
-
-//            projectsViewModel.addFavorite(categorie.getId());
+            bundle.putString("categoryTitle", categorie.getTitle());
             navController.navigate(R.id.navigation_projects, bundle);
         });
 

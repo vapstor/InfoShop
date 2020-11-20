@@ -138,4 +138,5 @@
     <string name="titulo_ou_descricao">Título ou descrição....</string>
     <string name="favoritos">Favoritos</string>
     <string name="Desfavoritar">Desfavoritar</string>
+    <string name="Total_">Total:</string>
 </resources>

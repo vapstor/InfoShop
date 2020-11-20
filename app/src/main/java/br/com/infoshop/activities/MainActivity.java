@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
@@ -33,18 +32,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        //observa mudanças no objeto firebase user
-        authViewModel.getLoggedUserLiveData().observe(this, firebaseUser -> {
-            if (firebaseUser == null) {
-                startActivity(new Intent(this, LoginOrSignUpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
-            } else {
-
-            }
-        });
-
-        setContentView(R.layout.activity_main);
+        //observa mudanças no objeto user
+        if (authViewModel.getLoggedUserLiveData().getValue() != null) {
+            authViewModel.getLoggedUserLiveData().observe(this, user -> {
+                if (user == null) {
+                    startActivity(new Intent(this, LoginOrSignUpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                }
+            });
+            setContentView(R.layout.activity_main);
+        } else {
+            startActivity(new Intent(this, LoginOrSignUpActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 
     @Override
@@ -70,15 +68,11 @@ public class MainActivity extends AppCompatActivity {
                         navController.navigate(R.id.navigation_profile);
                         break;
                     case R.id.navigation_projects_categories:
-                        if (destination != null)
-                            if (navController.popBackStack(R.id.navigation_projects_categories, false)) {
-
-                            } else {
+                        if (destination != null) {
+                            if (!navController.popBackStack(R.id.navigation_projects_categories, false)) {
                                 navController.navigate(R.id.navigation_projects_categories);
                             }
-//                            if (destination.getId() == R.id.navigation_projects) {
-//                                navController.navigate(R.id.navigation_projects_categories);
-//                            }
+                        }
                         break;
                 }
                 return false;
@@ -108,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 builder.setTitle("Logout")
                         .setMessage("Você deseja realmente sair?")
                         .setPositiveButton("Sair", (dialog, id) -> authViewModel.logout())
-                        .setNegativeButton("Cancelar", (dialog, id) -> { });
+                        .setNegativeButton("Cancelar", (dialog, id) -> {
+                        });
                 builder.create().show();
             } else {
                 super.onBackPressed();

@@ -31,19 +31,21 @@ import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import br.com.infoshop.R;
 import br.com.infoshop.activities.MainActivity;
 import br.com.infoshop.activities.ProjectDetailActivity;
-import br.com.infoshop.adapter.HomeProjectsAdapter;
+import br.com.infoshop.adapter.ProjectsAdapter;
 import br.com.infoshop.model.Project;
 import br.com.infoshop.utils.EndlessRecyclerViewScrollListener;
 import br.com.infoshop.utils.ItemClickSupport;
 import br.com.infoshop.utils.RecyclerItemTouchHelper;
+import br.com.infoshop.viewmodel.AuthViewModel;
 import br.com.infoshop.viewmodel.HomeViewModel;
 import br.com.infoshop.viewmodel.PesquisarViewModel;
 import br.com.infoshop.viewmodel.ProjectsViewModel;
@@ -57,13 +59,15 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
 
     private HomeViewModel homeViewModel;
     private LinearLayoutManager linearLayoutManager;
-    private HomeProjectsAdapter adapterProjects;
+    private ProjectsAdapter adapterProjects;
     private RecyclerView recyclerProjects;
     private SwipeRefreshLayout swipeContainer;
     // Store a member variable for the listener
     private EndlessRecyclerViewScrollListener scrollListener;
     private ProjectsViewModel projectsViewModel;
     private TextView usernameView;
+    @Inject
+    protected AuthViewModel authViewModel;
     private ConstraintLayout backgroundNoProjects;
     private PesquisarViewModel pesquisarViewModel;
     //Query para pesquisar
@@ -92,14 +96,8 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+
         projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
-
-        //Configura LM do Recycler
-        linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-        adapterProjects = new HomeProjectsAdapter(new ArrayList<>(), getContext());
-        adapterProjects.setHasStableIds(true);
 
         navView = getActivity().findViewById(R.id.nav_view);
 
@@ -118,10 +116,16 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         Context context = getContext();
         if (context != null) {
             setHasOptionsMenu(true);
-
-            usernameView.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+            usernameView.setText(authViewModel.getLoggedUserLiveData().getValue().getUsername());
             projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
             pesquisarViewModel = new ViewModelProvider(this).get(PesquisarViewModel.class);
+
+            //Configura LM do Recycler
+            linearLayoutManager = new LinearLayoutManager(getContext());
+            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+            adapterProjects = new ProjectsAdapter(new ArrayList<>(), getContext());
+            adapterProjects.setHasStableIds(true);
 
             recyclerProjects = view.findViewById(R.id.recycler_projects_home);
             recyclerProjects.setLayoutManager(linearLayoutManager);
@@ -130,7 +134,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             recyclerProjects.setAdapter(adapterProjects);
             swipeContainer = view.findViewById(R.id.layout_swipe_refresh);
             swipeContainer.setOnRefreshListener(this);
-
             // Retain an instance so that you can call `resetState()` for fresh searches
             scrollListener = new EndlessRecyclerViewScrollListener(new LinearLayoutManager(getContext())) {
 
@@ -146,7 +149,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             //Endless RecyclerView
             recyclerProjects.addOnScrollListener(scrollListener);
 
-
             backgroundNoProjects = view.findViewById(R.id.layout_background_home_recycler);
 
             swipeContainer.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
@@ -159,7 +161,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
             new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerProjects);
             ItemClickSupport.addTo(recyclerProjects).setOnItemClickListener((recyclerView, position, v) -> {
-                onDetailProject(projectsViewModel.getAllProjects().getValue().get(position));
+                onDetailProject(projectsViewModel.getAllProjectsLiveData().getValue().get(position));
             });
         }
     }
@@ -184,7 +186,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     private void fetchProjects(String query) {
         if (query != null && !query.isEmpty()) {
             projectsViewModel.fetchProjectsByQuery(query, 10);
-            projectsViewModel.getFilteredProjects().observe(getViewLifecycleOwner(), projects -> {
+            projectsViewModel.getFilteredProjectsLiveData().observe(getViewLifecycleOwner(), projects -> {
                 if (projects != null) {
                     if (projects.size() == 0) {
                         if (recyclerProjects.getVisibility() == View.VISIBLE)
@@ -219,7 +221,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         } else {
             //swipeContainer.setRefreshing(true);
             projectsViewModel.fetchProjects(10);
-            projectsViewModel.getAllProjects().observe(getViewLifecycleOwner(), projects -> {
+            projectsViewModel.getAllProjectsLiveData().observe(getViewLifecycleOwner(), projects -> {
                 if (projects != null) {
                     if (projects.size() == 0) {
                         if (recyclerProjects.getVisibility() == View.VISIBLE)
@@ -269,12 +271,13 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                 .setPositiveButton(R.string.excluir, (dialog, which) -> {
                     try {
                         adapterProjects.notifyItemRemoved(position);
-                        Project project = Objects.requireNonNull(projectsViewModel.getAllProjects().getValue()).get(position);
+                        Project project = Objects.requireNonNull(projectsViewModel.getAllProjectsLiveData().getValue()).get(position);
                         projectsViewModel.removeProject(project);
                     } catch (NullPointerException | IllegalStateException e) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                         builder.setMessage(e.getMessage());
-                        builder.setPositiveButton("OK", (dialog1, which1) -> {});
+                        builder.setPositiveButton("OK", (dialog1, which1) -> {
+                        });
                         builder.create().show();
                         Log.e(MY_LOG_TAG, "Erro: " + e.getLocalizedMessage());
                     }

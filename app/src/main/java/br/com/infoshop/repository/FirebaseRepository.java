@@ -5,10 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -78,7 +75,7 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
                         user.setUid(uid);
                         if (authResult != null && authResult.getAdditionalUserInfo() != null) {
                             if (authResult.getAdditionalUserInfo().isNewUser()) {
-                                user.setNew(true);
+                                user.setNew("true");
                                 //Atualiza firebaseUser com infos do nosso Usuario
                                 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                         .setDisplayName(user.getName())
@@ -97,7 +94,7 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
                                                             if (!document.exists()) {
                                                                 uidRef.set(user).addOnCompleteListener(userCreationTask -> {
                                                                     if (userCreationTask.isSuccessful()) {
-                                                                        user.setCreated(true);
+                                                                        user.setCreated("true");
                                                                         authenticatedUserMutableLiveData.setValue(user);
                                                                     } else {
                                                                         Log.d(MY_LOG_TAG, userCreationTask.getException().getMessage());
@@ -115,7 +112,7 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
                                             }
                                         });
                             } else {
-                                user.setNew(false);
+                                user.setNew("false");
                                 authenticatedUserMutableLiveData.setValue(user);
                             }
                         }
@@ -133,28 +130,6 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
         //Resgata usuario no banco de dados
         return usersRef.document(uid).get();
     }
-
-    public void reauthenticate(String email, String pass) {
-        // [START reauthenticate]
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        // Get auth credentials from the user for re-authentication. The example below shows
-        // email and password credentials but there are multiple possible providers,
-        // such as GoogleAuthProvider or FacebookAuthProvider.
-        AuthCredential credential = EmailAuthProvider
-                .getCredential(email, pass);
-
-        // Prompt the user to re-provide their sign-in credentials
-        user.reauthenticate(credential)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Log.d(MY_LOG_TAG, "User re-authenticated.");
-                    }
-                });
-        // [END reauthenticate]
-    }
-
 
     public MutableLiveData<User> firebaseLogin(String username, String password) {
         MutableLiveData<User> userMutableLiveData = new MutableLiveData<>();
@@ -219,8 +194,16 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
     }
 
     @Singleton
-    public Task<QuerySnapshot> fetchProjectsByTitle(String query, int pageLimit,
-                                                    int lastIdFetched) {
+    public Task<QuerySnapshot> fetchProjectsByCategory(int pageLimit, int lastIdFetched, int idCategory) {
+        if (lastIdFetched == 0) {
+            return this.database.collection("projetos").whereEqualTo("id_categoria", idCategory).orderBy("id").limit(pageLimit).get();
+        }
+        Query query = this.database.collection("projetos").whereEqualTo("id_categoria", idCategory).orderBy("id").startAfter(lastIdFetched).limit(pageLimit);
+        return query.get();
+    }
+
+    @Singleton
+    public Task<QuerySnapshot> fetchProjectsByTitle(String query, int pageLimit, int lastIdFetched) {
         if (lastIdFetched == 0) {
             return this.database.collection("projetos").whereArrayContains("titulo", query).limit(pageLimit).get();
         }
@@ -229,8 +212,7 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
     }
 
     @Singleton
-    public Task<QuerySnapshot> fetchProjectsByDesc(String query, int pageLimit,
-                                                   int lastIdFetched) {
+    public Task<QuerySnapshot> fetchProjectsByDesc(String query, int pageLimit, int lastIdFetched) {
         if (lastIdFetched == 0) {
             return this.database.collection("projetos").limit(pageLimit).whereArrayContains("descricao", query).get();
         }
@@ -240,20 +222,20 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
 
     @Singleton
     public Task<QuerySnapshot> fetchFavorites() {
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        return this.database.collection("favoritos").document(userUid).collection("my_favs").get();
+        String userEmail = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+        return this.database.collection("favoritos").document(userEmail).collection("my_favs").get();
     }
 
     @Singleton
     public Task<Void> addToFavorites(Project project) {
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        return this.database.collection("favoritos").document(userUid).collection("my_favs").document("projeto_" + project.getId()).set(project);
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        return this.database.collection("favoritos").document(userEmail).collection("my_favs").document("projeto_" + project.getId()).set(project);
     }
 
     @Singleton
     public Task<Void> removeFromFavorites(Project project) {
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        return this.database.collection("favoritos").document(userUid).collection("my_favs").document("projeto_" + project.getId()).delete();
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        return this.database.collection("favoritos").document(userEmail).collection("my_favs").document("projeto_" + project.getId()).delete();
     }
 
     @Singleton

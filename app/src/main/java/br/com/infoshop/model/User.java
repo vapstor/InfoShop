@@ -1,8 +1,10 @@
 package br.com.infoshop.model;
 
-public class User {
-    public String uid, name, username, pass, email, phone, address;
-    public boolean isNew, isCreated;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class User implements Parcelable {
+    public String uid, name, username, pass, email, phone, address, isCreated, isNew;
 
     public String getUid() {
         return uid;
@@ -23,7 +25,8 @@ public class User {
         this.pass = pass;
         this.address = address;
         this.phone = phone;
-        this.isCreated = false;
+        this.isCreated = "false";
+        this.isNew = "false";
     }
 
     public String getName() {
@@ -74,19 +77,63 @@ public class User {
         this.address = address;
     }
 
-    public boolean isNew() {
+    public String isNew() {
         return isNew;
     }
 
-    public void setNew(boolean aNew) {
+    public void setNew(String aNew) {
         isNew = aNew;
     }
 
-    public boolean isCreated() {
+    public String isCreated() {
         return isCreated;
     }
 
-    public void setCreated(boolean created) {
+    public void setCreated(String created) {
         isCreated = created;
+    }
+
+    /**
+     * PARCELABLE
+     **/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(username);
+        dest.writeString(email);
+        dest.writeString(pass);
+        dest.writeString(address);
+        dest.writeString(phone);
+        dest.writeString(isCreated);
+        dest.writeString(isNew);
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[0];
+        }
+    };
+
+    private User(Parcel in) {
+        name = in.readString();
+        username = in.readString();
+        email = in.readString();
+        pass = in.readString();
+        address = in.readString();
+        phone = in.readString();
+        isCreated = in.readString();
+        isNew = in.readString();
     }
 }

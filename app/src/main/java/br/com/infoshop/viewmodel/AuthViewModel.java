@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -17,7 +19,6 @@ import br.com.infoshop.repository.FirebaseRepository;
 @Singleton
 public class AuthViewModel extends AndroidViewModel {
     private FirebaseRepository authRepository;
-    public LiveData<User> createdUserLiveData;
 
     @ViewModelInject
     @Inject
@@ -35,13 +36,9 @@ public class AuthViewModel extends AndroidViewModel {
 
     MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
-    public LiveData<User> getCreatedUserLiveData() {
-        return createdUserLiveData;
-    }
-
     public void createUser(User user) {
         setLoading(true);
-        createdUserLiveData = authRepository.firebaseSignUp(user);
+        loggedUserLiveData = authRepository.firebaseSignUp(user);
     }
 
     public void login(String username, String password) {
@@ -61,4 +58,5 @@ public class AuthViewModel extends AndroidViewModel {
         authRepository.auth.signOut();
         loggedUserLiveData.setValue(null);
     }
+
 }

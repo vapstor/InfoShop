@@ -25,19 +25,16 @@ import br.com.infoshop.utils.RoundedTransformation;
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 import static br.com.infoshop.utils.Util.RSmask;
 
-public class HomeProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
+public class ProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
 
     private ArrayList<Project> itens;
     private final Context context;
-//    private final HomeViewModel homeViewModel;
 
-    //    public HomeProjectsAdapter(ArrayList<Project> itens, Context context, HomeViewModel homeViewModel) {
-    public HomeProjectsAdapter(ArrayList<Project> itens, Context context) {
+    public ProjectsAdapter(ArrayList<Project> itens, Context context) {
         if (itens == null)
             throw new NullPointerException("Lista de Itens Nula!");
         this.context = context;
         this.itens = itens;
-//        this.homeViewModel = homeViewModel;
     }
 
     @NonNull

@@ -19,6 +19,7 @@ import br.com.infoshop.model.Project;
 import br.com.infoshop.repository.FirebaseRepository;
 
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
+import static br.com.infoshop.utils.Util.RSmask;
 
 @Singleton
 public class ProjectsViewModel extends ViewModel {
@@ -26,9 +27,11 @@ public class ProjectsViewModel extends ViewModel {
     private FirebaseRepository repository;
     private MutableLiveData<ArrayList<Categorie>> mCategories = new MutableLiveData<>();
     private MutableLiveData<ArrayList<Project>> mProjects = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Project>> mProjectsByCategory = new MutableLiveData<>();
     private MutableLiveData<ArrayList<Project>> mFilteredProjects = new MutableLiveData<>();
     private MutableLiveData<ArrayList<Project>> mFavorites = new MutableLiveData<>();
     private MutableLiveData<Boolean> isFavorite = new MutableLiveData<>();
+    private MutableLiveData<String> mTotalFavPrice = new MutableLiveData<>();
 
     @ViewModelInject
     @Inject
@@ -69,8 +72,8 @@ public class ProjectsViewModel extends ViewModel {
         ArrayList<Project> projects;
         int idLastItemFetched;
 
-        if (getAllProjects().getValue() != null) {
-            projects = getAllProjects().getValue();
+        if (getAllProjectsLiveData().getValue() != null) {
+            projects = getAllProjectsLiveData().getValue();
             idLastItemFetched = projects.get(projects.size() - 1).getId();
         } else {
             projects = new ArrayList<>();
@@ -82,13 +85,6 @@ public class ProjectsViewModel extends ViewModel {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Project projeto = document.toObject(Project.class);
-//                            Project projeto = new Project(
-//                                    Integer.parseInt(String.valueOf(document.get("id"))),
-//                                    Integer.parseInt(String.valueOf(document.get("id_categoria"))),
-//                                    String.valueOf(document.get("titulo")),
-//                                    String.valueOf(document.get("descricao")),
-//                                    Double.parseDouble(String.valueOf(document.get("preco"))),
-//                                    String.valueOf(document.get("imagem")));
                             projects.add(projeto);
                             Log.d(MY_LOG_TAG, document.getId() + " => " + document.getData());
                         }
@@ -100,12 +96,40 @@ public class ProjectsViewModel extends ViewModel {
                 });
     }
 
+    public void fetchProjectsByCategory(int pageLimit, int idCategory) {
+        ArrayList<Project> projects;
+        int idLastItemFetched;
+
+        if (getProjectsByCategoryLiveData().getValue() != null && getProjectsByCategoryLiveData().getValue().size() > 0) {
+            projects = getProjectsByCategoryLiveData().getValue();
+            idLastItemFetched = projects.get(projects.size() - 1).getId();
+        } else {
+            projects = new ArrayList<>();
+            idLastItemFetched = 0;
+        }
+
+        this.repository.fetchProjectsByCategory(pageLimit, idLastItemFetched, idCategory).
+                addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Project projeto = document.toObject(Project.class);
+                            projects.add(projeto);
+                            Log.d(MY_LOG_TAG, document.getId() + " => " + document.getData());
+                        }
+                        setProjectsByCategory(projects);
+                    } else {
+                        setProjectsByCategory(null);
+                        Log.w(MY_LOG_TAG, "Error getting documents.", task.getException());
+                    }
+                });
+    }
+
     public void fetchProjectsByQuery(String query, int pageLimit) {
         ArrayList<Project> filteredProjects;
         int idLastItemFetched;
 
-        if (getFilteredProjects().getValue() != null) {
-            filteredProjects = getFilteredProjects().getValue();
+        if (getFilteredProjectsLiveData().getValue() != null) {
+            filteredProjects = getFilteredProjectsLiveData().getValue();
             idLastItemFetched = filteredProjects.get(filteredProjects.size() - 1).getId();
         } else {
             filteredProjects = new ArrayList<>();
@@ -149,22 +173,31 @@ public class ProjectsViewModel extends ViewModel {
         mProjects.setValue(projects);
     }
 
+    public void setProjectsByCategory(ArrayList<Project> projects) {
+        mProjectsByCategory.setValue(projects);
+    }
+
     public void setFilteredProjects(ArrayList<Project> projects) {
         mFilteredProjects.setValue(projects);
     }
 
-    public MutableLiveData<ArrayList<Project>> getAllProjects() {
+    public MutableLiveData<ArrayList<Project>> getAllProjectsLiveData() {
         return mProjects;
     }
 
-    public MutableLiveData<Boolean> getIsFavorite() {
-        return isFavorite;
-    }
-    public void setIsfavorite(boolean val) {
-        isFavorite.setValue(val);
+    public MutableLiveData<String> getTotalFavPriceLiveData() {
+        return mTotalFavPrice;
     }
 
-    public MutableLiveData<ArrayList<Project>> getFilteredProjects() {
+    public MutableLiveData<ArrayList<Project>> getProjectsByCategoryLiveData() {
+        return mProjectsByCategory;
+    }
+
+    public MutableLiveData<Boolean> getIsFavoriteLiveData() {
+        return isFavorite;
+    }
+
+    public MutableLiveData<ArrayList<Project>> getFilteredProjectsLiveData() {
         return mFilteredProjects;
     }
 
@@ -203,7 +236,7 @@ public class ProjectsViewModel extends ViewModel {
     }
 
     public void removeProject(Project project) {
-        ArrayList<Project> projetos = getAllProjects().getValue();
+        ArrayList<Project> projetos = getAllProjectsLiveData().getValue();
         if (projetos != null) {
             this.repository.removeFromAllProjects(project).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
@@ -263,5 +296,25 @@ public class ProjectsViewModel extends ViewModel {
                 });
     }
 
+    public void setTotalFavPrice(String value) {
+        mTotalFavPrice.setValue(value);
+    }
+
+    public void calculateFavoritesTotalPrice() {
+        ArrayList<Project> favorites = getFavoritesLiveData().getValue();
+        if (favorites != null) {
+            double total = 0.00;
+            if (favorites.size() > 0) {
+                for (int i = 0; i < favorites.size(); i++) {
+                    total = total + favorites.get(i).getPreco();
+                }
+                setTotalFavPrice(RSmask(total));
+            } else {
+                setTotalFavPrice("-");
+            }
+        } else {
+            setTotalFavPrice("-");
+        }
+    }
 
 }

@@ -1,9 +1,11 @@
 package br.com.infoshop.ui.login_signup.signup;
 
 import android.animation.LayoutTransition;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.transition.Fade;
@@ -26,13 +27,21 @@ import androidx.transition.TransitionManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import br.com.infoshop.R;
-import br.com.infoshop.viewmodel.AuthViewModel;
-import br.com.infoshop.model.User;
-import br.com.infoshop.viewmodel.SignUpViewModel;
+import javax.inject.Inject;
 
+import br.com.infoshop.R;
+import br.com.infoshop.activities.MainActivity;
+import br.com.infoshop.model.User;
+import br.com.infoshop.viewmodel.AuthViewModel;
+import br.com.infoshop.viewmodel.SignUpViewModel;
+import dagger.hilt.android.AndroidEntryPoint;
+
+import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
+
+@AndroidEntryPoint
 public class SignUpFragment extends Fragment {
-    private AuthViewModel authViewModel;
+    @Inject
+    protected AuthViewModel authViewModel;
     private SignUpViewModel signupViewModel;
     private NavController navController;
     private ProgressBar signupProgressBar;
@@ -56,9 +65,7 @@ public class SignUpFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewModelStoreOwner owner = navController.getViewModelStoreOwner(R.id.navigation_login_signup);
-        signupViewModel = new ViewModelProvider(owner).get(SignUpViewModel.class);
-        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        signupViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
         return inflater.inflate(R.layout.fragment_signup, container, false);
     }
 
@@ -226,25 +233,31 @@ public class SignUpFragment extends Fragment {
 
     private void createNewUser() {
         SignUpFormState signUpFormState = signupViewModel.getSignupFormState().getValue();
-        User newUser = new User(
-                signUpFormState.getName(),
-                signUpFormState.getUsername(),
-                signUpFormState.getEmail(),
-                signUpFormState.getPassword(),
-                signUpFormState.getAddress(),
-                signUpFormState.getPhone());
-
-        authViewModel.createUser(newUser);
-        authViewModel.getCreatedUserLiveData().observe(getViewLifecycleOwner(), user -> {
-            authViewModel.setLoading(false);
-            if (user.isCreated()) {
-                Toast.makeText(getContext(), "Usuário criado", Toast.LENGTH_SHORT).show();
-            } else if (!user.isNew()) {
-                Toast.makeText(getContext(), "Endereço de e-mail já cadastrado!" + user.getName(), Toast.LENGTH_SHORT).show();
-            }
-//            goToMainActivity(user);
-
-        });
+        try {
+            assert signUpFormState != null;
+            User newUser = new User(
+                    signUpFormState.getName(),
+                    signUpFormState.getUsername(),
+                    signUpFormState.getEmail(),
+                    signUpFormState.getPassword(),
+                    signUpFormState.getAddress(),
+                    signUpFormState.getPhone());
+            authViewModel.createUser(newUser);
+            authViewModel.getLoggedUserLiveData().observe(getViewLifecycleOwner(), user -> {
+                authViewModel.setLoading(false);
+                if (user == null)
+                    return;
+                if (user.isCreated().equals("true")) {
+                    Toast.makeText(getContext(), "Usuário cadastrado", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                } else if (!user.isNew().equals("true")) {
+                    Toast.makeText(getContext(), "Endereço de e-mail já cadastrado!", Toast.LENGTH_LONG).show();
+                }
+            });
+        } catch (NullPointerException e) {
+            Log.e(MY_LOG_TAG, e.getLocalizedMessage());
+            Toast.makeText(getContext(), "Ocorreu um erro!", Toast.LENGTH_LONG).show();
+        }
     }
 
 }

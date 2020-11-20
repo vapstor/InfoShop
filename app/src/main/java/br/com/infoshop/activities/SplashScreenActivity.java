@@ -38,7 +38,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 //                    if(user == null) {
 //                        intent = new Intent(this, LoginOrSignUpActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 //                    } else {
-                    Intent intent = new Intent(this, LoginOrSignUpActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent intent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     this.startActivity(intent);
                 });
             } catch (InterruptedException e) {

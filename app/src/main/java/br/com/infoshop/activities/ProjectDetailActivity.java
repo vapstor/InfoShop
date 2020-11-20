@@ -68,13 +68,13 @@ public class ProjectDetailActivity extends AppCompatActivity {
                             //O projeto pode ser o mesmo mas o endereço de memória dos dois objetos pode não ser o mesmo.
                             //Por causa disso não pode ser contains(o).
                             if (project.getId() == favorites.get(i).getId()) {
-                                projectsViewModel.getIsFavorite().setValue(true);
+                                projectsViewModel.getIsFavoriteLiveData().setValue(true);
                                 removeLoadingFrame();
                                 return;
                             }
                         }
                     }
-                    projectsViewModel.getIsFavorite().setValue(false);
+                    projectsViewModel.getIsFavoriteLiveData().setValue(false);
                     removeLoadingFrame();
                 } else {
                     Toast.makeText(this, "Sem favoritos!", Toast.LENGTH_SHORT).show();
@@ -98,7 +98,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
             }
         });
 
-        projectsViewModel.getIsFavorite().observe(this, fav -> {
+        projectsViewModel.getIsFavoriteLiveData().observe(this, fav -> {
             if (fav) {
                 setDrawableFull();
             } else {
@@ -115,7 +115,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
 
     private void updateProjectStatus() {
         try {
-            boolean fav = projectsViewModel.getIsFavorite().getValue().booleanValue();
+            boolean fav = projectsViewModel.getIsFavoriteLiveData().getValue().booleanValue();
             if (fav) {
                 projectsViewModel.removeFavorite(project);
                 actionTextExplained = "Você desfavoritou este projeto!";

@@ -3,6 +3,7 @@ package br.com.infoshop;
 import android.app.Application;
 import android.util.Log;
 
+import br.com.infoshop.viewmodel.AuthViewModel;
 import dagger.hilt.android.HiltAndroidApp;
 
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;

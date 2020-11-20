@@ -1,5 +1,6 @@
 package br.com.infoshop.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Callback;
@@ -18,38 +20,38 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import br.com.infoshop.R;
-import br.com.infoshop.holder.HomeProjectsViewHolder;
+import br.com.infoshop.holder.FavsProjectsViewHolder;
+import br.com.infoshop.interfaces.IUnfavClick;
 import br.com.infoshop.model.Project;
 import br.com.infoshop.utils.RoundedTransformation;
 
 import static br.com.infoshop.utils.Constants.MY_LOG_TAG;
 import static br.com.infoshop.utils.Util.RSmask;
 
-public class FavsProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHolder> {
+public class FavsProjectsAdapter extends RecyclerView.Adapter<FavsProjectsViewHolder> {
 
     private ArrayList<Project> itens;
     private final Context context;
-//    private final HomeViewModel homeViewModel;
+    private final IUnfavClick iUnfavClick;
 
-    //    public HomeProjectsAdapter(ArrayList<Project> itens, Context context, HomeViewModel homeViewModel) {
-    public FavsProjectsAdapter(ArrayList<Project> itens, Context context) {
+    public FavsProjectsAdapter(ArrayList<Project> itens, Context context, IUnfavClick iUnfavClick) {
         if (itens == null)
             throw new NullPointerException("Lista de Itens Nula!");
         this.context = context;
         this.itens = itens;
-//        this.homeViewModel = homeViewModel;
+        this.iUnfavClick = iUnfavClick;
     }
 
     @NonNull
     @Override
-    public HomeProjectsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavsProjectsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.layout_profile_recycler_fav_project_item_, parent, false);
-        return new HomeProjectsViewHolder(view);
+        return new FavsProjectsViewHolder(view);
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull HomeProjectsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FavsProjectsViewHolder holder, int position) {
         Project item = itens.get(position);
         //Titulo
         TextView titulo = holder.tituloDoProjeto;
@@ -66,6 +68,24 @@ public class FavsProjectsAdapter extends RecyclerView.Adapter<HomeProjectsViewHo
         //Imagem
         ImageView imagemItem = holder.imgProduto;
         String url = "https://www.royalfarma.com.br/uploads/" + item.getImagem();
+
+        //btn unfav
+        AppCompatImageButton btnUnfav = holder.unFavButton;
+        btnUnfav.setOnClickListener(v -> {
+            new AlertDialog.Builder(context, R.style.AlertDialog_Rounded)
+                    .setTitle(R.string.excluir)
+                    .setMessage(R.string.voce_tem_certeza_que_deseja_desfavoritar_este_projeto)
+                    .setNegativeButton(R.string.cancelar, (dialog, which) -> {
+//                    adapterProjects.notifyItemChanged(position);
+                        notifyItemRemoved(position);
+                        notifyItemInserted(position);
+                    })
+                    .setPositiveButton(R.string.excluir, (dialog, which) -> {
+                        this.iUnfavClick.onUnfav(position);
+                    }).setOnDismissListener(dialog -> notifyItemChanged(position)).show();
+
+        });
+
 
         //LOADER
         final ProgressBar progressView = holder.progressBar;
