@@ -98,16 +98,26 @@ public class MainActivity extends AppCompatActivity {
         if (navHostFragment != null) {
             int backstack = navHostFragment.getChildFragmentManager().getBackStackEntryCount();
             if (backstack == 0) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Logout")
-                        .setMessage("Você deseja realmente sair?")
-                        .setPositiveButton("Sair", (dialog, id) -> authViewModel.logout())
-                        .setNegativeButton("Cancelar", (dialog, id) -> {
-                        });
-                builder.create().show();
+                confirmaLogout();
             } else {
                 super.onBackPressed();
             }
         }
+    }
+
+    private void confirmaLogout() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Logout")
+                .setMessage("Você deseja realmente sair?")
+                .setPositiveButton("Sair", (dialog, id) -> authViewModel.logout())
+                .setNegativeButton("Cancelar", (dialog, id) -> {
+                });
+        builder.create().show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        authViewModel.logout();
+        super.onDestroy();
     }
 }

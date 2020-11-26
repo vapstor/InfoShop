@@ -158,8 +158,6 @@ public class ProjectsFragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (swipeContainer.isRefreshing()) {
                         swipeContainer.setRefreshing(false);
                     }
-
-                    Toast.makeText(getContext(), "Sem projetos!", Toast.LENGTH_SHORT).show();
                 } else {
                     //Confirme que o frame não bloqueia a UI
                     toggleFrameLoadingVisibility(false);

@@ -47,7 +47,6 @@ import br.com.infoshop.utils.ItemClickSupport;
 import br.com.infoshop.utils.RecyclerItemTouchHelper;
 import br.com.infoshop.viewmodel.AuthViewModel;
 import br.com.infoshop.viewmodel.HomeViewModel;
-import br.com.infoshop.viewmodel.PesquisarViewModel;
 import br.com.infoshop.viewmodel.ProjectsViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -64,12 +63,12 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     private SwipeRefreshLayout swipeContainer;
     // Store a member variable for the listener
     private EndlessRecyclerViewScrollListener scrollListener;
-    private ProjectsViewModel projectsViewModel;
+    @Inject
+    public ProjectsViewModel projectsViewModel;
     private TextView usernameView;
     @Inject
     protected AuthViewModel authViewModel;
     private ConstraintLayout backgroundNoProjects;
-    private PesquisarViewModel pesquisarViewModel;
     //Query para pesquisar
     private String query;
     private BottomNavigationView navView;
@@ -95,18 +94,11 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-
-
-        projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
-
         navView = getActivity().findViewById(R.id.nav_view);
-
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         final TextView boasVindasTextView = root.findViewById(R.id.boas_vindas_text_view);
         usernameView = root.findViewById(R.id.home_usuario_name_text_view);
-
         homeViewModel.getBoasVindasMessageLiveData().observe(getViewLifecycleOwner(), boasVindasTextView::setText);
-
         return root;
     }
 
@@ -117,8 +109,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         if (context != null) {
             setHasOptionsMenu(true);
             usernameView.setText(authViewModel.getLoggedUserLiveData().getValue().getUsername());
-            projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
-            pesquisarViewModel = new ViewModelProvider(this).get(PesquisarViewModel.class);
 
             //Configura LM do Recycler
             linearLayoutManager = new LinearLayoutManager(getContext());
@@ -184,8 +174,12 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     //param query: "" -> todos
     //param query !"" -> filtrados por nome/descricao
     private void fetchProjects(String query) {
+        // setRefreshing(false) to signal refresh has finished
+        if (!swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(true);
+        }
         if (query != null && !query.isEmpty()) {
-            projectsViewModel.fetchProjectsByQuery(query, 10);
+            projectsViewModel.fetchProjectsByQuery(query, 0);
             projectsViewModel.getFilteredProjectsLiveData().observe(getViewLifecycleOwner(), projects -> {
                 if (projects != null) {
                     if (projects.size() == 0) {
@@ -204,7 +198,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                         if (recyclerProjects.getVisibility() != View.VISIBLE)
                             recyclerProjects.setVisibility(View.VISIBLE);
 
-
                         adapterProjects.updateProjectsList(projects);
                         if (recyclerProjects.getVisibility() != View.VISIBLE) {
                             recyclerProjects.setVisibility(View.VISIBLE);
@@ -216,6 +209,10 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                     }
                 } else {
                     Toast.makeText(getContext(), "Falhou ao recuperar projetos filtrados!", Toast.LENGTH_SHORT).show();
+                }
+                // setRefreshing(false) to signal refresh has finished
+                if (swipeContainer.isRefreshing()) {
+                    swipeContainer.setRefreshing(false);
                 }
             });
         } else {
@@ -244,13 +241,13 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                         if (recyclerProjects.getVisibility() != View.VISIBLE) {
                             recyclerProjects.setVisibility(View.VISIBLE);
                         }
-                        // setRefreshing(false) to signal refresh has finished
-                        if (swipeContainer.isRefreshing()) {
-                            swipeContainer.setRefreshing(false);
-                        }
                     }
                 } else {
                     Toast.makeText(getContext(), "Falhou ao recuperar projetos!", Toast.LENGTH_SHORT).show();
+                }
+                // setRefreshing(false) to signal refresh has finished
+                if (swipeContainer.isRefreshing()) {
+                    swipeContainer.setRefreshing(false);
                 }
             });
         }
@@ -290,7 +287,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         if (!swipeContainer.isRefreshing()) {
             swipeContainer.setRefreshing(true);
         }
-//        projectsViewModel.clearProjects();
         fetchProjects("");
     }
 
@@ -315,9 +311,6 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             @Override
             public boolean onQueryTextChange(String newText) {
                 //de fato não utilizado (para consultas a cada letra inserida)
-                if (!newText.equals("")) {
-                    pesquisarViewModel.setNewQuery(newText);
-                }
                 return false;
             }
         });

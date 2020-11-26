@@ -86,13 +86,13 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
                                         .addOnCompleteListener(task -> {
                                             if (task.isSuccessful()) {
                                                 //Cria usuario no banco de dados
-                                                DocumentReference uidRef = usersRef.document(user.uid);
-                                                uidRef.get().addOnCompleteListener(uidTask -> {
+                                                DocumentReference emailRef = usersRef.document(user.email);
+                                                emailRef.get().addOnCompleteListener(uidTask -> {
                                                     if (uidTask.isSuccessful()) {
                                                         DocumentSnapshot document = uidTask.getResult();
                                                         if (document != null) {
                                                             if (!document.exists()) {
-                                                                uidRef.set(user).addOnCompleteListener(userCreationTask -> {
+                                                                emailRef.set(user).addOnCompleteListener(userCreationTask -> {
                                                                     if (userCreationTask.isSuccessful()) {
                                                                         user.setCreated("true");
                                                                         authenticatedUserMutableLiveData.setValue(user);
@@ -133,48 +133,32 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
 
     public MutableLiveData<User> firebaseLogin(String username, String password) {
         MutableLiveData<User> userMutableLiveData = new MutableLiveData<>();
-        FirebaseUser fbUser = auth.getCurrentUser();
-        if (fbUser == null) {
-            if (!username.isEmpty() && !password.isEmpty()) {
-                auth.signInWithEmailAndPassword(username, password).
-                        addOnCompleteListener(taskLogin -> {
-                            if (taskLogin.isSuccessful()) {
-                                try {
-                                    //auth.getCurrentUser não é mais o mesmo que fbUser
-                                    fetchUserInfos(Objects.requireNonNull(auth.getCurrentUser()).getUid()).addOnCompleteListener(taskGetInfo -> {
-                                        if (taskGetInfo.isSuccessful()) {
-                                            DocumentSnapshot doc = taskGetInfo.getResult();
-                                            if (doc != null) {
-                                                User user = doc.toObject(User.class);
-                                                userMutableLiveData.setValue(user);
-                                            }
-                                        } else {
-                                            // get info fails
-                                            userMutableLiveData.setValue(null);
+        if (!username.isEmpty() && !password.isEmpty()) {
+            auth.signInWithEmailAndPassword(username, password).
+                    addOnCompleteListener(taskLogin -> {
+                        if (taskLogin.isSuccessful()) {
+                            try {
+                                //auth.getCurrentUser ja foi autenticado positivamente
+                                fetchUserInfos(Objects.requireNonNull(auth.getCurrentUser()).getEmail()).addOnCompleteListener(taskGetInfo -> {
+                                    if (taskGetInfo.isSuccessful()) {
+                                        DocumentSnapshot doc = taskGetInfo.getResult();
+                                        if (doc != null) {
+                                            User user = doc.toObject(User.class);
+                                            userMutableLiveData.setValue(user);
                                         }
-                                    });
-                                } catch (NullPointerException e) {
-                                    Log.e(MY_LOG_TAG, e.getMessage());
-                                }
-                            } else {
-                                // sign in fails
-                                userMutableLiveData.setValue(null);
+                                    } else {
+                                        // get info fails
+                                        userMutableLiveData.setValue(null);
+                                    }
+                                });
+                            } catch (NullPointerException e) {
+                                Log.e(MY_LOG_TAG, e.getMessage());
                             }
-                        });
-            }
-        } else {
-            //usuario já se logou, só recuperar informações
-            fetchUserInfos(fbUser.getUid()).addOnCompleteListener(taskGetInfo -> {
-                if (taskGetInfo.isSuccessful()) {
-                    DocumentSnapshot doc = taskGetInfo.getResult();
-                    if (doc != null) {
-                        User user = doc.toObject(User.class);
-                        userMutableLiveData.setValue(user);
-                    }
-                } else {
-                    userMutableLiveData.setValue(null);
-                }
-            });
+                        } else {
+                            // sign in fails
+                            userMutableLiveData.setValue(null);
+                        }
+                    });
         }
         return userMutableLiveData;
     }
@@ -187,6 +171,9 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
     @Singleton
     public Task<QuerySnapshot> fetchProjects(int pageLimit, int lastIdFetched) {
         if (lastIdFetched == 0) {
+            if (pageLimit == 0) {
+                return this.database.collection("projetos").orderBy("id").get();
+            }
             return this.database.collection("projetos").orderBy("id").limit(pageLimit).get();
         }
         Query query = this.database.collection("projetos").orderBy("id").startAfter(lastIdFetched).limit(pageLimit);
@@ -205,18 +192,18 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
     @Singleton
     public Task<QuerySnapshot> fetchProjectsByTitle(String query, int pageLimit, int lastIdFetched) {
         if (lastIdFetched == 0) {
-            return this.database.collection("projetos").whereArrayContains("titulo", query).limit(pageLimit).get();
+            return this.database.collectionGroup("projetos").whereArrayContains("titulo", query).limit(pageLimit).get();
         }
-        Query titleQuery = this.database.collection("projetos").whereArrayContains("titulo", query).startAfter(lastIdFetched).limit(pageLimit);
+        Query titleQuery = this.database.collectionGroup("projetos").whereArrayContains("titulo", query).startAfter(lastIdFetched).limit(pageLimit);
         return titleQuery.get();
     }
 
     @Singleton
     public Task<QuerySnapshot> fetchProjectsByDesc(String query, int pageLimit, int lastIdFetched) {
         if (lastIdFetched == 0) {
-            return this.database.collection("projetos").limit(pageLimit).whereArrayContains("descricao", query).get();
+            return this.database.collectionGroup("projetos").limit(pageLimit).whereArrayContains("descricao", query).get();
         }
-        Query descQuery = this.database.collection("projetos").whereArrayContains("descricao", query);
+        Query descQuery = this.database.collectionGroup("projetos").whereArrayContains("descricao", query);
         return descQuery.get();
     }
 
@@ -248,5 +235,27 @@ public class FirebaseRepository implements FirebaseAuth.AuthStateListener {
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         int i = 0;
         Log.d(MY_LOG_TAG, "A");
+    }
+
+    public MutableLiveData<User> firebaseCheckLogin() {
+        MutableLiveData<User> userMutableLiveData = new MutableLiveData<>();
+        FirebaseUser fbUser = auth.getCurrentUser();
+        if (fbUser != null) {
+            //usuario já se logou, só recuperar informações
+            fetchUserInfos(fbUser.getUid()).addOnCompleteListener(taskGetInfo -> {
+                if (taskGetInfo.isSuccessful()) {
+                    DocumentSnapshot doc = taskGetInfo.getResult();
+                    if (doc != null) {
+                        User user = doc.toObject(User.class);
+                        userMutableLiveData.setValue(user);
+                    }
+                } else {
+                    userMutableLiveData.setValue(null);
+                }
+            });
+        } else {
+            userMutableLiveData.setValue(null);
+        }
+        return userMutableLiveData;
     }
 }

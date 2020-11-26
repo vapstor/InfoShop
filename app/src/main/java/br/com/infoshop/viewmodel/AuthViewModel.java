@@ -5,10 +5,7 @@ import android.app.Application;
 
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
-import com.google.firebase.auth.FirebaseUser;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -57,6 +54,10 @@ public class AuthViewModel extends AndroidViewModel {
     public void logout() {
         authRepository.auth.signOut();
         loggedUserLiveData.setValue(null);
+    }
+
+    public void checkIsFirebaseUserLogged() {
+        loggedUserLiveData =  authRepository.firebaseCheckLogin();
     }
 
 }

@@ -72,7 +72,7 @@ public class ProjectsViewModel extends ViewModel {
         ArrayList<Project> projects;
         int idLastItemFetched;
 
-        if (getAllProjectsLiveData().getValue() != null) {
+        if (getAllProjectsLiveData().getValue() != null && getAllProjectsLiveData().getValue().size() > 0) {
             projects = getAllProjectsLiveData().getValue();
             idLastItemFetched = projects.get(projects.size() - 1).getId();
         } else {
@@ -125,47 +125,30 @@ public class ProjectsViewModel extends ViewModel {
     }
 
     public void fetchProjectsByQuery(String query, int pageLimit) {
-        ArrayList<Project> filteredProjects;
-        int idLastItemFetched;
-
-        if (getFilteredProjectsLiveData().getValue() != null) {
-            filteredProjects = getFilteredProjectsLiveData().getValue();
-            idLastItemFetched = filteredProjects.get(filteredProjects.size() - 1).getId();
-        } else {
-            filteredProjects = new ArrayList<>();
-            idLastItemFetched = 0;
-        }
-
-        //Primeiro filtra por titulo
-        this.repository.fetchProjectsByTitle(query, pageLimit, idLastItemFetched).
+        ArrayList<Project> filteredProjects = new ArrayList<>();
+        //Recupera projetos e ve se contem a string no titulo ou descrição
+        //Retorna novo array de projetos filtrado
+        this.repository.fetchProjects(pageLimit, 0).
                 addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot obj = task.getResult();
-                        for (QueryDocumentSnapshot document : obj) {
-                            Project projeto = document.toObject(Project.class);
-                            filteredProjects.add(projeto);
-                            Log.d(MY_LOG_TAG, document.getId() + " => " + document.getData());
+                        if (obj != null) {
+                            for (QueryDocumentSnapshot document : obj) {
+                                Project projeto = document.toObject(Project.class);
+                                if (projeto.getTitulo().equalsIgnoreCase(query) || projeto.getTitulo().contains(query)) {
+                                    filteredProjects.add(projeto);
+                                } else if (projeto.getDescricao().equalsIgnoreCase(query) || projeto.getDescricao().contains(query)) {
+                                    filteredProjects.add(projeto);
+                                }
+                                Log.d(MY_LOG_TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w(MY_LOG_TAG, "Objeto [QuerySnapshot] Nulo.", task.getException());
                         }
-                        setFilteredProjects(filteredProjects);
                     } else {
-                        setFilteredProjects(null);
                         Log.w(MY_LOG_TAG, "Error getting documents.", task.getException());
                     }
-                });
-        //depois filtra por descricao
-        this.repository.fetchProjectsByDesc(query, pageLimit, idLastItemFetched)
-                .addOnCompleteListener(otherTask -> {
-                    if (otherTask.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : otherTask.getResult()) {
-                            Project projeto = document.toObject(Project.class);
-                            filteredProjects.add(projeto);
-                            Log.d(MY_LOG_TAG, document.getId() + " => " + document.getData());
-                        }
-                        setFilteredProjects(filteredProjects);
-                    } else {
-                        setFilteredProjects(null);
-                        Log.w(MY_LOG_TAG, "Error getting documents.", otherTask.getException());
-                    }
+                    setFilteredProjects(filteredProjects);
                 });
     }
 
