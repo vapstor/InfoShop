@@ -11,7 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +33,7 @@ import androidx.transition.TransitionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -72,21 +73,39 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
     //Query para pesquisar
     private String query;
     private BottomNavigationView navView;
-
+    private ImageButton sortProjectsBtn;
+    private final String[] sortOptions = new String[]{"A-Z", "Z-A", "Maior preço (S+)", "Menor Preço ($-)"};
+    private boolean filtrado = false;
     //Adiciona um frame ao recycler para indicar carregamento
     //@param bool frameVisibility: se o frame está visivel (true) ou não
-    private void toggleFrameLoadingVisibility(boolean frameVisibility) {
+//    private void toggleFrameLoadingVisibility(boolean frameVisibility) {
+//        if (getActivity() != null) {
+//            final ViewGroup root = getActivity().findViewById(R.id.root_home);
+//            if (root != null) {
+//                FrameLayout frameLayout = root.findViewById(R.id.layout_frame_loading);
+//                TransitionManager.beginDelayedTransition(root, new Fade().setDuration(750));
+//                if (frameVisibility) {
+//                    frameLayout.setVisibility(View.VISIBLE);
+//                    frameLayout.setClickable(true);
+//                    frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
+//                } else {
+//                    frameLayout.setVisibility(View.INVISIBLE);
+//                }
+//            }
+//        }
+//    }
+
+    private void toggleSortButtonVisibility(boolean visibility) {
         if (getActivity() != null) {
             final ViewGroup root = getActivity().findViewById(R.id.root_home);
             if (root != null) {
-                FrameLayout frameLayout = root.findViewById(R.id.layout_frame_loading);
                 TransitionManager.beginDelayedTransition(root, new Fade().setDuration(750));
-                if (frameVisibility) {
-                    frameLayout.setVisibility(View.VISIBLE);
-                    frameLayout.setClickable(true);
-                    frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
+                if (visibility) {
+                    sortProjectsBtn.setVisibility(View.VISIBLE);
+                    sortProjectsBtn.setClickable(true);
                 } else {
-                    frameLayout.setVisibility(View.INVISIBLE);
+                    sortProjectsBtn.setVisibility(View.INVISIBLE);
+                    sortProjectsBtn.setClickable(false);
                 }
             }
         }
@@ -98,6 +117,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         final TextView boasVindasTextView = root.findViewById(R.id.boas_vindas_text_view);
         usernameView = root.findViewById(R.id.home_usuario_name_text_view);
+        sortProjectsBtn = root.findViewById(R.id.sortProjectsBtn);
         homeViewModel.getBoasVindasMessageLiveData().observe(getViewLifecycleOwner(), boasVindasTextView::setText);
         return root;
     }
@@ -153,6 +173,66 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             ItemClickSupport.addTo(recyclerProjects).setOnItemClickListener((recyclerView, position, v) -> {
                 onDetailProject(projectsViewModel.getAllProjectsLiveData().getValue().get(position));
             });
+
+            sortProjectsBtn.setOnClickListener(v -> {
+                new AlertDialog.Builder(getContext())
+                        .setItems(sortOptions, (dialog, which) -> {
+                            ordenaProjetos(which);
+                        }).create().show();
+            });
+        }
+    }
+
+    private void ordenaProjetos(int which) {
+        if (!swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(true);
+        }
+        ArrayList<Project> listaDeProjetos;
+        if (!filtrado) {
+            listaDeProjetos = projectsViewModel.getAllProjectsLiveData().getValue();
+        } else {
+            listaDeProjetos = projectsViewModel.getFilteredProjectsLiveData().getValue();
+        }
+        //Não precisa conferir se é nulo pois se o click foi efetuado o botao está aparecendo, logo a lista não está vazia. Mas coloquei só por desencargo de consciência e para sumir o warning rs.
+        //Conferir observadores do projetos/projetosFiltrados
+        if (listaDeProjetos == null) {
+            Toast.makeText(getContext(), "Erro! Lista Nula!", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (listaDeProjetos.size() > 1) {
+            switch (which) {
+                //A-z
+                case 0:
+                    // ## Ascending order
+                    // To compare string values
+                    Collections.sort(listaDeProjetos, (obj1, obj2) -> obj1.getTitulo().compareToIgnoreCase(obj2.getTitulo()));
+                    break;
+                case 1:
+                    // ## Ascending order
+                    // To compare string values
+                    Collections.sort(listaDeProjetos, (obj1, obj2) -> obj1.getTitulo().compareToIgnoreCase(obj2.getTitulo()));
+                    Collections.reverse(listaDeProjetos);
+                    break;
+                //$+
+                case 2:
+                    // ## Ascending order
+                    Collections.sort(listaDeProjetos, (obj1, obj2) -> Double.compare(obj2.getPreco(), obj1.getPreco()));
+                    break;
+                //$-
+                case 3:
+                    // ## Descending order
+                    Collections.sort(listaDeProjetos, (obj1, obj2) -> Double.compare(obj1.getPreco(), obj2.getPreco()));
+                    break;
+            }
+            if (filtrado) {
+                projectsViewModel.setFilteredProjects(listaDeProjetos);
+            } else {
+                projectsViewModel.setAllProjects(listaDeProjetos);
+            }
+        } else {
+            if (swipeContainer.isRefreshing()) {
+                swipeContainer.setRefreshing(false);
+            }
+            Log.i(MY_LOG_TAG, "Lista com apenas um valor!");
         }
     }
 
@@ -179,6 +259,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
             swipeContainer.setRefreshing(true);
         }
         if (query != null && !query.isEmpty()) {
+            filtrado = true;
             projectsViewModel.fetchProjectsByQuery(query, 0);
             projectsViewModel.getFilteredProjectsLiveData().observe(getViewLifecycleOwner(), projects -> {
                 if (projects != null) {
@@ -187,12 +268,12 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                             recyclerProjects.setVisibility(View.GONE);
                         if (backgroundNoProjects.getVisibility() != View.VISIBLE)
                             backgroundNoProjects.setVisibility(View.VISIBLE);
-
+                        toggleSortButtonVisibility(false);
                         Toast.makeText(getContext(), "Não há projetos com esse Titulo ou Descrição!", Toast.LENGTH_SHORT).show();
                     } else {
                         //Confirme que o frame não bloqueia a UI
-                        toggleFrameLoadingVisibility(false);
-
+//                        toggleFrameLoadingVisibility(false);
+                        toggleSortButtonVisibility(true);
                         if (backgroundNoProjects.getVisibility() == View.VISIBLE)
                             backgroundNoProjects.setVisibility(View.GONE);
                         if (recyclerProjects.getVisibility() != View.VISIBLE)
@@ -208,6 +289,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                         }
                     }
                 } else {
+                    toggleSortButtonVisibility(false);
                     Toast.makeText(getContext(), "Falhou ao recuperar projetos filtrados!", Toast.LENGTH_SHORT).show();
                 }
                 // setRefreshing(false) to signal refresh has finished
@@ -216,7 +298,7 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                 }
             });
         } else {
-            //swipeContainer.setRefreshing(true);
+            filtrado = false;
             projectsViewModel.fetchProjects(10);
             projectsViewModel.getAllProjectsLiveData().observe(getViewLifecycleOwner(), projects -> {
                 if (projects != null) {
@@ -225,24 +307,25 @@ public class HomeFragment extends Fragment implements RecyclerItemTouchHelper.Re
                             recyclerProjects.setVisibility(View.GONE);
                         if (backgroundNoProjects.getVisibility() != View.VISIBLE)
                             backgroundNoProjects.setVisibility(View.VISIBLE);
-
+                        toggleSortButtonVisibility(false);
                         Toast.makeText(getContext(), "Sem projetos!", Toast.LENGTH_SHORT).show();
                     } else {
                         //Confirme que o frame não bloqueia a UI
-                        toggleFrameLoadingVisibility(false);
+//                        toggleFrameLoadingVisibility(false);
 
                         if (backgroundNoProjects.getVisibility() == View.VISIBLE)
                             backgroundNoProjects.setVisibility(View.GONE);
                         if (recyclerProjects.getVisibility() != View.VISIBLE)
                             recyclerProjects.setVisibility(View.VISIBLE);
 
-
+                        toggleSortButtonVisibility(true);
                         adapterProjects.updateProjectsList(projects);
                         if (recyclerProjects.getVisibility() != View.VISIBLE) {
                             recyclerProjects.setVisibility(View.VISIBLE);
                         }
                     }
                 } else {
+                    toggleSortButtonVisibility(false);
                     Toast.makeText(getContext(), "Falhou ao recuperar projetos!", Toast.LENGTH_SHORT).show();
                 }
                 // setRefreshing(false) to signal refresh has finished
