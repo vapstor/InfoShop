@@ -56,7 +56,7 @@
   - [x] Perfil
   - [x] Home
   - [x] Projetos
-- [ ] Configurar pesquisa na aba Projetos
+- [x] Configurar pesquisa na aba Projetos
 - [x] Permitir salvar/excluir projetos favoritos
 
 * Desenvolver LoginPage ["LOGIN"]
@@ -80,22 +80,22 @@
   -  [x] Implementar Ordenação por "Preço" na lista de projetos
   
 * Desenvolver ProfilePage ["Perfil"]
-  - [ ] Implementar Views (Nome, Email, Endereço)
-  - [ ] Implementar Button para fragmento favoritos
+  - [x] Implementar Views (Nome, Email, Endereço)
+  - [x] Implementar Button para fragmento favoritos
   
   * Desenvolver FavoritosFragment
-    - [ ] Implementar RecyclerView com lista de projetos favoritos
-    - [ ] Implementar ImageButton (star) para desfavoritar e assim remove-lo da lista
+    - [x] Implementar RecyclerView com lista de projetos favoritos
+    - [x] Implementar ImageButton (star) para desfavoritar e assim remove-lo da lista
 
 * Desenvolver ProjetosPage ["Projetos"]
   * Desenvolver CategoriasFragment
     - [x] Implementar gridview (4) categorias
     - [x] Implementar GET firebase 
   * Desenvolver ProjetosFragment
-    - [ ] Implementar SearchBar ("Busque um projeto...")
-    - [ ] Implementar pesquisa por nome/descrição de projeto (regex)
-    - [ ] Implementar botão para limpar seção de pesquisa
-    - [ ] Implementar Ordenação (A definir)
+    - [x] Implementar SearchBar ("Busque um projeto...")
+    - [x] Implementar pesquisa por nome/descrição de projeto (regex)
+    - [x] Implementar botão para limpar seção de pesquisa
+    - [x] Implementar Ordenação (A definir)
     
 ## How to version
 
